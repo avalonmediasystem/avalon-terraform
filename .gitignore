@@ -1,0 +1,21 @@
+# Compiled files
+*.tfstate
+*.tfstate.backup
+
+# Module directory
+.terraform/
+
+# Plan files
+*.plan
+
+# Variable definitions
+*.tfvars
+**/build
+*tfstate*
+**/node_modules
+**/package-lock.json
+
+.env
+applications/**/Dockerrun.aws.json
+stack/applications/**/Dockerrun.aws.json
+batch
