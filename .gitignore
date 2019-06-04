@@ -10,6 +10,7 @@
 
 # Variable definitions
 *.tfvars
+*.tfbackend
 **/build
 *tfstate*
 **/node_modules

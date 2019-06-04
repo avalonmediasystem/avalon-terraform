@@ -82,49 +82,37 @@ output "vpc_cidr_block" {
 #   value = "2181"
 # }
 
-output "db_address" {
-  value = "${module.db.this_db_instance_address}"
+output "db_avalon_address" {
+  value = "${module.db_avalon.this_db_instance_address}"
 }
 
-output "db_port" {
-  value = "${module.db.this_db_instance_port}"
+output "db_avalon_port" {
+  value = "${module.db_avalon.this_db_instance_port}"
 }
 
-output "db_master_username" {
-  value = "${module.db.this_db_instance_username}"
+output "db_avalon_username" {
+  value = "${module.db_avalon.this_db_instance_username}"
 }
 
-output "db_master_password" {
-  value = "${module.db.this_db_instance_password}"
+output "db_avalon_password" {
+  value = "${module.db_avalon.this_db_instance_password}"
 }
 
-# output "elasticsearch_endpoint" {
-#   value = "https://${aws_elasticsearch_domain.elasticsearch.endpoint}/"
-# }
+output "db_fcrepo_address" {
+  value = "${module.db_fcrepo.this_db_instance_address}"
+}
 
-# output "exhibitor_endpoint" {
-#   value = "http://${aws_route53_record.zookeeper.name}/exhibitor/v1/ui/index.html"
-# }
+output "db_fcrepo_port" {
+  value = "${module.db_fcrepo.this_db_instance_port}"
+}
 
-# output "iiif_endpoint" {
-#   value = "${local.iiif_base_url}iiif/2"
-# }
+output "db_fcrepo_username" {
+  value = "${module.db_fcrepo.this_db_instance_username}"
+}
 
-# output "iiif_pyramid_bucket" {
-#   value = "${aws_s3_bucket.pyramid_tiff_bucket.id}"
-# }
-
-# output "iiif_pyramid_bucket_arn" {
-#   value = "${aws_s3_bucket.pyramid_tiff_bucket.arn}"
-# }
-
-# output "index_endpoint" {
-#   value = "http://${aws_route53_record.solr.name}/solr/"
-# }
-
-# output "metadata_endpoint" {
-#   value = "${local.iiif_base_url}"
-# }
+output "db_fcrepo_password" {
+  value = "${module.db_fcrepo.this_db_instance_password}"
+}
 
 output "private_subnets" {
   value = "${module.vpc.private_subnets}"

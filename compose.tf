@@ -1,17 +1,3 @@
-module "this_db" {
-  source          = "modules/database"
-  schema          = "${local.app_name}"
-  host            = "${data.terraform_remote_state.stack.db_address}"
-  port            = "${data.terraform_remote_state.stack.db_port}"
-  master_username = "${data.terraform_remote_state.stack.db_master_username}"
-  master_password = "${data.terraform_remote_state.stack.db_master_password}"
-
-  connection = {
-    user        = "ec2-user"
-    host        = "${data.terraform_remote_state.stack.compose_address}"
-    private_key = "${file(var.ec2_private_keyfile)}"
-  }
-}
 
 data "aws_ami" "amzn" {
   most_recent = true
@@ -52,9 +38,8 @@ data "aws_iam_policy_document" "compose" {
 }
 
 resource "aws_iam_policy" "this_bucket_policy" {
-  name   = "${data.terraform_remote_state.stack.stack_name}-${local.app_name}-bucket-access"
+  name   = "${var.stack_name}-${var.app_name}-bucket-access"
   policy = "${data.aws_iam_policy_document.this_bucket_access.json}"
-  role = "${aws_iam_role.compose.id}"
 }
 
 resource "aws_iam_instance_profile" "compose" {

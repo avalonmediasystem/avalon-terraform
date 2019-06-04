@@ -19,8 +19,12 @@ variable "compose_instance_type" {
   default = "t2.large"
 }
 
-variable "db_master_username" {
-  default = "dbadmin"
+variable "db_avalon_username" {
+  default = "dbavalon"
+}
+
+variable "db_fcrepo_username" {
+  default = "dbfcrepo"
 }
 
 variable "ec2_keyname" {
