@@ -66,13 +66,13 @@ output "vpc_cidr_block" {
 #   value = "${aws_route53_record.bastion.name}"
 # }
 
-# output "cache_address" {
-#   value = "${aws_route53_record.redis.name}"
-# }
+output "cache_address" {
+  value = "${aws_route53_record.redis.name}"
+}
 
-# output "cache_port" {
-#   value = "${aws_elasticache_cluster.redis.cache_nodes.0.port}"
-# }
+output "cache_port" {
+  value = "${aws_elasticache_cluster.redis.cache_nodes.0.port}"
+}
 
 # output "zookeeper_address" {
 #   value = "zk.${local.private_zone_name}"

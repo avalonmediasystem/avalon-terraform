@@ -39,6 +39,18 @@ variable "environment" {
   type    = "string"
 }
 
+variable "fcrepo_binary_bucket_username" {
+  type    = "string"
+}
+
+variable "fcrepo_binary_bucket_access_key" {
+  type    = "string"
+}
+
+variable "fcrepo_binary_bucket_secret_key" {
+  type    = "string"
+}
+
 variable "hosted_zone_name" {
   type    = "string"
 }

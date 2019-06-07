@@ -79,3 +79,45 @@ data "aws_iam_policy_document" "this_bucket_access" {
   }
 }
 
+resource "aws_s3_bucket" "fcrepo_binary_bucket" {
+  bucket = "${local.namespace}-fedora-binaries"
+  acl    = "private"
+  tags   = "${local.common_tags}"
+}
+
+data "aws_iam_policy_document" "fcrepo_binary_bucket_access" {
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets"]
+    resources = ["arn:aws:s3:::*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+    ]
+
+    resources = ["${aws_s3_bucket.fcrepo_binary_bucket.arn}"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+    ]
+
+    resources = ["${aws_s3_bucket.fcrepo_binary_bucket.arn}/*"]
+  }
+}
+
+resource "aws_iam_user_policy" "fcrepo_binary_bucket_policy" {
+  name   = "${local.namespace}-fcrepo-s3-bucket-access"
+  user   = "${var.fcrepo_binary_bucket_username}"
+  policy = "${data.aws_iam_policy_document.fcrepo_binary_bucket_access.json}"
+}

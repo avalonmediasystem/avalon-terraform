@@ -58,9 +58,24 @@ data "aws_iam_policy_document" "compose_api_access" {
     actions   = [
                   "ec2:DescribeInstances",
                   "elasticfilesystem:*",
+                  "elastictranscoder:List*",
+                  "elastictranscoder:Read*",
+                  "elastictranscoder:CreatePreset",
+                  "elastictranscoder:ListPresets",
+                  "elastictranscoder:ReadPreset",
+                  "elastictranscoder:ListJobs",
+                  "elastictranscoder:CreateJob",
+                  "elastictranscoder:ReadJob",
+                  "elastictranscoder:CancelJob",
                   "s3:*",
                   "cloudwatch:PutMetricData",
-                  "ssm:Get*"
+                  "ssm:Get*",
+                  "logs:CreateLogGroup",
+                  "logs:CreateLogStream",
+                  "logs:DescribeLogGroups",
+                  "logs:DescribeLogStreams",
+                  "logs:PutLogEvents",
+                  "logs:PutRetentionPolicy",
                 ]
     resources = ["*"]
   }
@@ -83,7 +98,25 @@ resource "aws_security_group" "compose" {
   tags        = "${local.common_tags}"
 }
 
-resource "aws_security_group_rule" "compose_ingress" {
+resource "aws_security_group_rule" "compose_web" {
+  security_group_id = "${aws_security_group.compose.id}"
+  type              = "ingress"
+  from_port         = "80"
+  to_port           = "80"
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "compose_streaming" {
+  security_group_id = "${aws_security_group.compose.id}"
+  type              = "ingress"
+  from_port         = "8880"
+  to_port           = "8880"
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "compose_ssh" {
   security_group_id = "${aws_security_group.compose.id}"
   type              = "ingress"
   from_port         = "22"
@@ -101,8 +134,17 @@ resource "aws_security_group_rule" "compose_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "allow_this_redis_access" {
+  security_group_id        = "${aws_security_group.redis.id}"
+  type                     = "ingress"
+  from_port                = "${aws_elasticache_cluster.redis.cache_nodes.0.port}"
+  to_port                  = "${aws_elasticache_cluster.redis.cache_nodes.0.port}"
+  protocol                 = "tcp"
+  source_security_group_id = "${aws_security_group.compose.id}"
+}
+
 resource "aws_instance" "compose" {
-  ami                         = "${data.aws_ami.amzn.id}"
+  ami                         = "ami-08b255f35f032a5ea"
   instance_type               = "${var.compose_instance_type}"
   key_name                    = "${var.ec2_keyname}"
   subnet_id                   = "${module.vpc.public_subnets[0]}"
@@ -125,6 +167,40 @@ resource "null_resource" "install_docker_on_compose" {
     host = "${aws_instance.compose.id}"
   }
 
+  provisioner "file" {
+    connection {
+      host        = "${aws_instance.compose.public_dns}"
+      user        = "ec2-user"
+      agent       = true
+      timeout     = "10m"
+      private_key = "${file(var.ec2_private_keyfile)}"
+    }
+
+    content     = <<EOF
+FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${module.db_fcrepo.this_db_instance_address} -Dfcrepo.postgresql.username=${module.db_fcrepo.this_db_instance_username} -Dfcrepo.postgresql.password=${module.db_fcrepo.this_db_instance_password} -Dfcrepo.postgresql.port=${module.db_fcrepo.this_db_instance_port} -Daws.accessKeyId=${var.fcrepo_binary_bucket_access_key} -Daws.secretKey=${var.fcrepo_binary_bucket_secret_key} -Daws.bucket=${aws_s3_bucket.fcrepo_binary_bucket.id}
+FEDORA_LOGGROUP=aws/ec2/turnkey-fedora/fedora.log
+
+AVALON_STREAMING_BUCKET=${aws_s3_bucket.this_derivatives.id}
+AVALON_LOGGROUP=/aws/ec2/turnkey-avalon/avalon.log
+
+DATABASE_URL=postgres://${module.db_avalon.this_db_instance_username}:${module.db_avalon.this_db_instance_password}@${module.db_avalon.this_db_instance_address}/avalon
+ELASTICACHE_HOST=${aws_route53_record.redis.name}
+SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b16f44aa54a98008d62f6874360284d00bb29dc08c166197d043406b42190188a
+AVALON_BRANCH=master
+AWS_REGION=us-east-1
+SETTINGS__DOMAIN=${aws_route53_record.compose.fqdn}
+SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/
+SETTINGS__DROPBOX__UPLOAD_URI=s3://${aws_s3_bucket.this_masterfiles.id}/
+SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id}/
+SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
+SETTINGS__ENCODING__ENGINE_ADAPTER=elastic_transcoder
+SETTINGS__ENCODING__PIPELINE=${aws_elastictranscoder_pipeline.this_pipeline.id}
+STREAMING_HOST=${aws_route53_record.compose.fqdn}
+SETTINGS__STREAMING__HTTP_BASE=http://${aws_route53_record.compose.fqdn}:8880/avalon
+EOF
+    destination = "/tmp/.env"
+  }
+
   provisioner "remote-exec" {
     connection {
       host        = "${aws_instance.compose.public_dns}"
@@ -135,7 +211,8 @@ resource "null_resource" "install_docker_on_compose" {
     }
 
     inline = [
-      "sudo curl -L 'https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose"
+      "wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip && unzip aws_min.zip",
+      "cd avalon-docker-aws_min && cp /tmp/.env_avalon . && docker-compose up -d"
     ]
   }
 }
@@ -147,3 +224,28 @@ resource "aws_route53_record" "compose" {
   ttl     = "300"
   records = ["${aws_instance.compose.public_ip}"]
 }
+
+# resource "aws_cloudwatch_log_group" "compose_log_group" {
+#   name = "${local.namespace}"
+# }
+
+# data "aws_iam_policy_document" "elasticsearch-log-publishing-policy" {
+#   statement {
+#     actions = [
+
+#     ]
+
+#     resources = ["arn:aws:logs:*"]
+
+#     principals {
+#       identifiers = ["es.amazonaws.com"]
+#       type        = "Service"
+#     }
+#   }
+# }
+
+# resource "aws_cloudwatch_log_resource_policy" "elasticsearch-log-publishing-policy" {
+#   policy_document = "${data.aws_iam_policy_document.elasticsearch-log-publishing-policy.json}"
+#   policy_name     = "elasticsearch-log-publishing-policy"
+# }
+ 
