@@ -178,17 +178,17 @@ resource "null_resource" "install_docker_on_compose" {
 
     content     = <<EOF
 FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${module.db_fcrepo.this_db_instance_address} -Dfcrepo.postgresql.username=${module.db_fcrepo.this_db_instance_username} -Dfcrepo.postgresql.password=${module.db_fcrepo.this_db_instance_password} -Dfcrepo.postgresql.port=${module.db_fcrepo.this_db_instance_port} -Daws.accessKeyId=${var.fcrepo_binary_bucket_access_key} -Daws.secretKey=${var.fcrepo_binary_bucket_secret_key} -Daws.bucket=${aws_s3_bucket.fcrepo_binary_bucket.id}
-FEDORA_LOGGROUP=aws/ec2/turnkey-fedora/fedora.log
+FEDORA_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/fedora.log
 
 AVALON_STREAMING_BUCKET=${aws_s3_bucket.this_derivatives.id}
-AVALON_LOGGROUP=/aws/ec2/turnkey-avalon/avalon.log
+AVALON_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/avalon.log
 
 DATABASE_URL=postgres://${module.db_avalon.this_db_instance_username}:${module.db_avalon.this_db_instance_password}@${module.db_avalon.this_db_instance_address}/avalon
 ELASTICACHE_HOST=${aws_route53_record.redis.name}
 SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b16f44aa54a98008d62f6874360284d00bb29dc08c166197d043406b42190188a
 AVALON_BRANCH=master
 AWS_REGION=us-east-1
-SETTINGS__DOMAIN=${aws_route53_record.compose.fqdn}
+SETTINGS__DOMAIN=http://${aws_route53_record.compose.fqdn}
 SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/
 SETTINGS__DROPBOX__UPLOAD_URI=s3://${aws_s3_bucket.this_masterfiles.id}/
 SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id}/
@@ -212,22 +212,45 @@ EOF
 
     inline = [
       "wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip && unzip aws_min.zip",
-      "cd avalon-docker-aws_min && cp /tmp/.env_avalon . && docker-compose up -d"
+      "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d"
     ]
   }
 }
 
 resource "aws_route53_record" "compose" {
   zone_id = "${module.dns.public_zone_id}"
-  name    = "compose.${local.public_zone_name}"
+  name    = "web.${local.public_zone_name}"
   type    = "A"
   ttl     = "300"
   records = ["${aws_instance.compose.public_ip}"]
 }
 
-# resource "aws_cloudwatch_log_group" "compose_log_group" {
-#   name = "${local.namespace}"
-# }
+resource "aws_s3_bucket_policy" "compose-s3" {
+  bucket = "${aws_s3_bucket.this_derivatives.id}"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "MYBUCKETPOLICY",
+  "Statement": [
+    {
+      "Sid": "IPAllow",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::${aws_s3_bucket.this_derivatives.id}/*",
+      "Condition": {
+         "IpAddress": {"aws:SourceIp": "${aws_instance.compose.public_ip}"}
+      }
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_cloudwatch_log_group" "compose_log_group" {
+  name = "${local.namespace}"
+}
 
 # data "aws_iam_policy_document" "elasticsearch-log-publishing-policy" {
 #   statement {

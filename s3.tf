@@ -1,7 +1,8 @@
 resource "aws_s3_bucket" "this_masterfiles" {
-  bucket = "${local.namespace}-masterfiles"
-  acl    = "private"
-  tags   = "${local.common_tags}"
+  bucket        = "${local.namespace}-masterfiles"
+  acl           = "private"
+  tags          = "${local.common_tags}"
+  force_destroy = "true"
 
   cors_rule {
     allowed_origins = ["*"]
@@ -10,9 +11,10 @@ resource "aws_s3_bucket" "this_masterfiles" {
 }
 
 resource "aws_s3_bucket" "this_derivatives" {
-  #  bucket = "${local.namespace}-derivatives"
-  acl  = "private"
-  tags = "${local.common_tags}"
+  bucket        = "${local.namespace}-derivatives"
+  acl           = "private"
+  tags          = "${local.common_tags}"
+  force_destroy = "true"
 
   cors_rule {
     allowed_origins = ["*"]
@@ -23,9 +25,10 @@ resource "aws_s3_bucket" "this_derivatives" {
 }
 
 resource "aws_s3_bucket" "this_preservation" {
-  #  bucket = "${local.namespace}-avr-preservation"
-  acl  = "private"
-  tags = "${local.common_tags}"
+  bucket        = "${local.namespace}-preservation"
+  acl           = "private"
+  tags          = "${local.common_tags}"
+  force_destroy = "true"
 }
 
 data "aws_iam_policy_document" "this_bucket_access" {
@@ -83,6 +86,7 @@ resource "aws_s3_bucket" "fcrepo_binary_bucket" {
   bucket = "${local.namespace}-fedora-binaries"
   acl    = "private"
   tags   = "${local.common_tags}"
+  force_destroy = "true"
 }
 
 data "aws_iam_policy_document" "fcrepo_binary_bucket_access" {
