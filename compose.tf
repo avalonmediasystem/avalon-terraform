@@ -211,6 +211,10 @@ EOF
     }
 
     inline = [
+      "echo '${aws_efs_file_system.compose_efs.id}:/ /mnt/efs_vol efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab",
+      "sudo mkdir -p /mnt/efs_vol && sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${aws_efs_file_system.compose_efs.dns_name}:/ /mnt/efs_vol",
+      "echo '{\"data-root\": \"/mnt/efs_vol\"}' | sudo tee -a /etc/docker/daemon.json",
+      "sudo service docker restart",
       "wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip && unzip aws_min.zip",
       "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d"
     ]
@@ -251,24 +255,3 @@ POLICY
 resource "aws_cloudwatch_log_group" "compose_log_group" {
   name = "${local.namespace}"
 }
-
-# data "aws_iam_policy_document" "elasticsearch-log-publishing-policy" {
-#   statement {
-#     actions = [
-
-#     ]
-
-#     resources = ["arn:aws:logs:*"]
-
-#     principals {
-#       identifiers = ["es.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-# }
-
-# resource "aws_cloudwatch_log_resource_policy" "elasticsearch-log-publishing-policy" {
-#   policy_document = "${data.aws_iam_policy_document.elasticsearch-log-publishing-policy.json}"
-#   policy_name     = "elasticsearch-log-publishing-policy"
-# }
- 
