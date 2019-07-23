@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "aws-sdk": "^2.229.1",
+    "crypto-js": "latest",
+    "uuid": "^3.2.1",
+    "jsonwebtoken": "^8.4.0",
+    "lodash.isobject": "^3.0.2",
+    "lodash.isstring": "^4.0.1",
+    "middy": "^0.19.4",
+    "node-fetch": "^2.3.0",
+    "url": "^0.11.0"
+  },
+  "description": "AWS Lambda function to have Avalon invoke its batch status report jobs.",
+  "directories": {},
+  "license": "Apache-2.0",
+  "main": "./index.js",
+  "maintainers": [
+    {
+      "name": "mbklein",
+      "email": "mbklein@gmail.com"
+    }
+  ],
+  "name": "avalon-batch-status",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "version": "0.0.1"
+}
