@@ -75,17 +75,7 @@ data "aws_iam_policy_document" "compose_api_access" {
                   "logs:DescribeLogGroups",
                   "logs:DescribeLogStreams",
                   "logs:PutLogEvents",
-                  "logs:PutRetentionPolicy",
-                  "sqs:ChangeMessageVisibility",
-                  "sqs:ChangeMessageVisibilityBatch",
-                  "sqs:DeleteMessage",
-                  "sqs:DeleteMessageBatch",
-                  "sqs:GetQueueAttributes",
-                  "sqs:GetQueueUrl",
-                  "sqs:ReceiveMessage",
-                  "sqs:SendMessage",
-                  "sqs:SendMessageBatch",
-                  "sqs:ListQueues"
+                  "logs:PutRetentionPolicy"
     ]
     resources = ["*"]
   }
@@ -198,10 +188,9 @@ ELASTICACHE_HOST=${aws_route53_record.redis.name}
 SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b16f44aa54a98008d62f6874360284d00bb29dc08c166197d043406b42190188a
 AVALON_BRANCH=master
 AWS_REGION=us-east-1
-SQS_URL=${aws_sqs_queue.this_batch_queue.id}
 SETTINGS__DOMAIN=http://${aws_route53_record.compose.fqdn}
-SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox
-SETTINGS__DROPBOX__UPLOAD_URI=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox
+SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
+SETTINGS__DROPBOX__UPLOAD_URI=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
 SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id}/
 SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
 SETTINGS__ENCODING__ENGINE_ADAPTER=elastic_transcoder
