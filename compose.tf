@@ -188,15 +188,15 @@ ELASTICACHE_HOST=${aws_route53_record.redis.name}
 SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b16f44aa54a98008d62f6874360284d00bb29dc08c166197d043406b42190188a
 AVALON_BRANCH=master
 AWS_REGION=us-east-1
-SETTINGS__DOMAIN=http://${aws_route53_record.compose.fqdn}
+SETTINGS__DOMAIN=http://${aws_route53_record.alb.fqdn}
 SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
 SETTINGS__DROPBOX__UPLOAD_URI=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
 SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id}/
 SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
 SETTINGS__ENCODING__ENGINE_ADAPTER=elastic_transcoder
 SETTINGS__ENCODING__PIPELINE=${aws_elastictranscoder_pipeline.this_pipeline.id}
-STREAMING_HOST=${aws_route53_record.compose.fqdn}
-SETTINGS__STREAMING__HTTP_BASE=http://${aws_route53_record.compose.fqdn}:8880/avalon
+STREAMING_HOST=${aws_route53_record.alb.fqdn}
+SETTINGS__STREAMING__HTTP_BASE=http://${aws_route53_record.alb.fqdn}:8880/avalon
 EOF
     destination = "/tmp/.env"
   }
@@ -219,14 +219,6 @@ EOF
       "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d"
     ]
   }
-}
-
-resource "aws_route53_record" "compose" {
-  zone_id = "${module.dns.public_zone_id}"
-  name    = "web.${local.public_zone_name}"
-  type    = "A"
-  ttl     = "300"
-  records = ["${aws_instance.compose.public_ip}"]
 }
 
 resource "aws_s3_bucket_policy" "compose-s3" {
