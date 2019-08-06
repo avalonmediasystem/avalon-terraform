@@ -195,8 +195,8 @@ SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id
 SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
 SETTINGS__ENCODING__ENGINE_ADAPTER=elastic_transcoder
 SETTINGS__ENCODING__PIPELINE=${aws_elastictranscoder_pipeline.this_pipeline.id}
-STREAMING_HOST=${aws_route53_record.alb.fqdn}
-SETTINGS__STREAMING__HTTP_BASE=http://${aws_route53_record.alb.fqdn}:8880/avalon
+STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
+SETTINGS__STREAMING__HTTP_BASE=http://${aws_route53_record.alb_streaming.fqdn}/avalon
 EOF
     destination = "/tmp/.env"
   }
