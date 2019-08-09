@@ -48,6 +48,16 @@ To actually make those changes:
 
     terraform apply
 
+## Extra settings
+
+### Email
+
+In order for Avalon to send mails using AWS, you need to add these variables to the `terraform.tfvars` file and make sure these email addresses are [verified in Simple Email Service](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses.html):
+
+    email_comments      = "comments@mydomain.org"
+    email_notification  = "notification@mydomain.org"
+    email_support       = "support@mydomain.org"
+
 # Maintenance
 
 ## Update the stack

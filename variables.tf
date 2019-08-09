@@ -35,6 +35,18 @@ variable "ec2_private_keyfile" {
   type    = "string"
 }
 
+variable "email_comments" {
+  type    = "string"
+}
+
+variable "email_notification" {
+  type    = "string"
+}
+
+variable "email_support" {
+  type    = "string"
+}
+
 variable "environment" {
   type    = "string"
 }

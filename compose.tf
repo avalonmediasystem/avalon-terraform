@@ -68,6 +68,8 @@ data "aws_iam_policy_document" "compose_api_access" {
                   "elastictranscoder:ReadJob",
                   "elastictranscoder:CancelJob",
                   "s3:*",
+                  "ses:SendEmail",
+                  "ses:SendRawEmail",
                   "cloudwatch:PutMetricData",
                   "ssm:Get*",
                   "logs:CreateLogGroup",
@@ -195,6 +197,9 @@ SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id
 SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
 SETTINGS__ENCODING__ENGINE_ADAPTER=elastic_transcoder
 SETTINGS__ENCODING__PIPELINE=${aws_elastictranscoder_pipeline.this_pipeline.id}
+SETTINGS__EMAIL__COMMENTS=${var.email_comments}
+SETTINGS__EMAIL__NOTIFICATION=${var.email_notification}
+SETTINGS__EMAIL__SUPPORT=${var.email_support}
 STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
 SETTINGS__STREAMING__HTTP_BASE=http://${aws_route53_record.alb_streaming.fqdn}/avalon
 EOF
