@@ -194,7 +194,7 @@ ELASTICACHE_HOST=${aws_route53_record.redis.name}
 SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b16f44aa54a98008d62f6874360284d00bb29dc08c166197d043406b42190188a
 AVALON_BRANCH=master
 AWS_REGION=us-east-1
-SETTINGS__DOMAIN=http://${aws_route53_record.alb.fqdn}
+SETTINGS__DOMAIN=https://${aws_route53_record.alb.fqdn}
 SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
 SETTINGS__DROPBOX__UPLOAD_URI=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
 SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id}/
@@ -205,7 +205,7 @@ SETTINGS__EMAIL__COMMENTS=${var.email_comments}
 SETTINGS__EMAIL__NOTIFICATION=${var.email_notification}
 SETTINGS__EMAIL__SUPPORT=${var.email_support}
 STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
-SETTINGS__STREAMING__HTTP_BASE=http://${aws_route53_record.alb_streaming.fqdn}/avalon
+SETTINGS__STREAMING__HTTP_BASE=https://${aws_route53_record.alb_streaming.fqdn}/avalon
 EOF
     destination = "/tmp/.env"
   }

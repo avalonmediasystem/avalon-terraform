@@ -48,6 +48,8 @@ To actually make those changes:
 
     terraform apply
 
+Be patient, the script attempts to register SSL certificates for your domains and AWS cert validation process can take from 5 to 30 minutes.
+
 ## Extra settings
 
 ### Email
