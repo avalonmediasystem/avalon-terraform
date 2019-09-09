@@ -3,7 +3,7 @@ resource "aws_alb" "alb" {
   subnets         = ["${module.vpc.public_subnets}"]
   security_groups = ["${aws_security_group.alb.id}"]
 #   internal        = "${var.internal_alb}"  
-#   idle_timeout    = "${var.idle_timeout}"   
+  idle_timeout    = "300"
 #   tags {    
 #     Name    = "${var.alb_name}"    
 #   }   

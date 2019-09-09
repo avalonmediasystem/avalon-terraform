@@ -30,6 +30,8 @@ module "db_fcrepo" {
 
   subnet_ids = ["${module.vpc.private_subnets}"]
 
+  availability_zone = "${aws_instance.compose.availability_zone}"
+
   family = "postgres10"
 
   parameters = [

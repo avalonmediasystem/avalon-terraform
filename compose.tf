@@ -158,6 +158,13 @@ resource "aws_instance" "compose" {
   iam_instance_profile        = "${aws_iam_instance_profile.compose.name}"
   tags                        = "${merge(local.common_tags, map("Name", "${local.namespace}-compose"))}"
 
+  root_block_device {
+    volume_size = "50"
+    volume_type = "standard"
+  }
+
+  user_data = "${file("scripts/attach_ebs.sh")}"
+
   vpc_security_group_ids = [
     "${aws_security_group.compose.id}",
     "${aws_security_group.db_client.id}",
@@ -220,9 +227,6 @@ EOF
     }
 
     inline = [
-      "echo '${aws_efs_file_system.compose_efs.id}:/ /mnt/efs_vol efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab",
-      "sudo mkdir -p /mnt/efs_vol && sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${aws_efs_file_system.compose_efs.dns_name}:/ /mnt/efs_vol",
-      "echo '{\"data-root\": \"/mnt/efs_vol\"}' | sudo tee -a /etc/docker/daemon.json",
       "sudo service docker restart",
       "wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip && unzip aws_min.zip",
       "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d"
@@ -255,4 +259,15 @@ POLICY
 
 resource "aws_cloudwatch_log_group" "compose_log_group" {
   name = "${local.namespace}"
+}
+
+resource "aws_volume_attachment" "compose_solr" {
+  device_name = "/dev/sdh"
+  volume_id   = "${aws_ebs_volume.solr_data.id}"
+  instance_id = "${aws_instance.compose.id}"
+}
+
+resource "aws_ebs_volume" "solr_data" {
+  availability_zone = "${var.availability_zone}"
+  size              = 20
 }
