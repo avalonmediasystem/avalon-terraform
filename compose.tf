@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "compose" {
 }
 
 resource "aws_iam_policy" "this_bucket_policy" {
-  name   = "${var.stack_name}-${var.app_name}-bucket-access"
+  name   = "${local.namespace}-compose-bucket-access"
   policy = "${data.aws_iam_policy_document.this_bucket_access.json}"
 }
 

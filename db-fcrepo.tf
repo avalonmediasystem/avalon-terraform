@@ -43,28 +43,28 @@ module "db_fcrepo" {
 }
 
 resource "aws_ssm_parameter" "db_fcrepo_host" {
-  name        = "/${var.stack_name}-fcrepo-db/host"
+  name        = "/${local.namespace}-fcrepo-db/host"
   value       = "${module.db_fcrepo.this_db_instance_address}"
   type        = "String"
   overwrite   = true
 }
 
 resource "aws_ssm_parameter" "db_fcrepo_port" {
-  name        = "/${var.stack_name}-fcrepo-db/port"
+  name        = "/${local.namespace}-fcrepo-db/port"
   value       = "${module.db_fcrepo.this_db_instance_port}"
   type        = "String"
   overwrite   = true
 }
 
 resource "aws_ssm_parameter" "db_fcrepo_admin_user" {
-  name        = "/${var.stack_name}-fcrepo-db/admin_user"
+  name        = "/${local.namespace}-fcrepo-db/admin_user"
   value       = "${module.db_fcrepo.this_db_instance_username}"
   type        = "SecureString"
   overwrite   = true
 }
 
 resource "aws_ssm_parameter" "db_fcrepo_admin_password" {
-  name        = "/${var.stack_name}-fcrepo-db/admin_password"
+  name        = "/${local.namespace}-fcrepo-db/admin_password"
   value       = "${module.db_fcrepo.this_db_instance_password}"
   type        = "SecureString"
   overwrite   = true
