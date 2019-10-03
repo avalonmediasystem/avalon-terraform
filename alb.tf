@@ -42,10 +42,14 @@ resource "aws_security_group_rule" "alb_egress" {
 # Domain names for web and streaming endpoints
 resource "aws_route53_record" "alb" {
   zone_id = "${module.dns.public_zone_id}"
-  name    = "web.${local.public_zone_name}"
-  type    = "CNAME"
-  ttl     = "300"
-  records = ["${aws_alb.alb.dns_name}"]
+  name    = "${local.public_zone_name}"
+  type    = "A"
+
+  alias {
+    name                   = "${aws_alb.alb.dns_name}"
+    zone_id                = "${aws_alb.alb.zone_id}"
+    evaluate_target_health = true
+  }
 }
 
 resource "aws_route53_record" "alb_streaming" {
@@ -173,7 +177,7 @@ resource "aws_acm_certificate" "web_cert" {
 resource "aws_route53_record" "web_cert_validation" {
   name    = "${aws_acm_certificate.web_cert.domain_validation_options.0.resource_record_name}"
   type    = "${aws_acm_certificate.web_cert.domain_validation_options.0.resource_record_type}"
-  zone_id = "${data.aws_route53_zone.hosted_zone.id}"
+  zone_id = "${module.dns.public_zone_id}"
   records = ["${aws_acm_certificate.web_cert.domain_validation_options.0.resource_record_value}"]
   ttl     = 60
 }

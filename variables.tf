@@ -114,8 +114,8 @@ variable "vpc_private_subnets" {
 
 locals {
   namespace         = "${var.stack_name}-${var.environment}"
-  public_zone_name  = "${var.stack_name}.${var.hosted_zone_name}"
-  private_zone_name = "${var.stack_name}.vpc.${var.hosted_zone_name}"
+  public_zone_name  = "${var.environment}.${var.hosted_zone_name}"
+  private_zone_name = "vpc.${var.environment}.${var.hosted_zone_name}"
 
   common_tags = "${merge(
     var.tags,

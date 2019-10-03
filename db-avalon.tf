@@ -41,28 +41,28 @@ module "db_avalon" {
 }
 
 resource "aws_ssm_parameter" "db_avalon_host" {
-  name        = "/${var.stack_name}-avalon-db/host"
+  name        = "/${local.namespace}-avalon-db/host"
   value       = "${module.db_avalon.this_db_instance_address}"
   type        = "String"
   overwrite   = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_port" {
-  name        = "/${var.stack_name}-avalon-db/port"
+  name        = "/${local.namespace}-avalon-db/port"
   value       = "${module.db_avalon.this_db_instance_port}"
   type        = "String"
   overwrite   = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_admin_user" {
-  name        = "/${var.stack_name}-avalon-db/admin_user"
+  name        = "/${local.namespace}-avalon-db/admin_user"
   value       = "${module.db_avalon.this_db_instance_username}"
   type        = "SecureString"
   overwrite   = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_admin_password" {
-  name        = "/${var.stack_name}-avalon-db/admin_password"
+  name        = "/${local.namespace}-avalon-db/admin_password"
   value       = "${module.db_avalon.this_db_instance_password}"
   type        = "SecureString"
   overwrite   = true
