@@ -227,6 +227,9 @@ EOF
     }
 
     inline = [
+      "echo '${aws_efs_file_system.solr_backups.id}:/ /srv/solr_backups efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab",
+      "sudo mkdir -p /srv/solr_backups && sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${aws_efs_file_system.solr_backups.dns_name}:/ /srv/solr_backups",
+      "sudo chown 8983:8983 /srv/solr_backups",
       "sudo service docker restart",
       "wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip && unzip aws_min.zip",
       "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d"

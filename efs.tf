@@ -1,14 +1,14 @@
-resource "aws_efs_file_system" "compose_efs" {
+resource "aws_efs_file_system" "solr_backups" {
   creation_token   = "${local.namespace}-efs"
   performance_mode = "generalPurpose"
   encrypted        = "false"
 
-  tags = "${local.common_tags}"
+  tags = "${merge(local.common_tags, map ("Name", "${local.namespace}-solr_backups"))}"
 }
 
-resource "aws_efs_mount_target" "compose_efs_mount" {
+resource "aws_efs_mount_target" "solr_backups_mount" {
 #   count           = "${length(var.subnets)}"
-  file_system_id  = "${aws_efs_file_system.compose_efs.id}"
+  file_system_id  = "${aws_efs_file_system.solr_backups.id}"
   subnet_id       = "${module.vpc.public_subnets[0]}"
   security_groups = ["${aws_security_group.efs_sgroup.id}"]
 }
