@@ -3,7 +3,7 @@ variable "app_name" {
 }
 
 variable "azs" {
-  type    = "list"
+  type    = list(string)
   default = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
@@ -20,7 +20,7 @@ variable "bastion_instance_type" {
 }
 
 variable "compose_instance_type" {
-  default = "t2.large"
+  default = "t3.large"
 }
 
 variable "db_avalon_username" {
@@ -32,43 +32,43 @@ variable "db_fcrepo_username" {
 }
 
 variable "ec2_keyname" {
-  type    = "string"
+  type = string
 }
 
 variable "ec2_private_keyfile" {
-  type    = "string"
+  type = string
 }
 
 variable "email_comments" {
-  type    = "string"
+  type = string
 }
 
 variable "email_notification" {
-  type    = "string"
+  type = string
 }
 
 variable "email_support" {
-  type    = "string"
+  type = string
 }
 
 variable "environment" {
-  type    = "string"
+  type = string
 }
 
 variable "fcrepo_binary_bucket_username" {
-  type    = "string"
+  type = string
 }
 
 variable "fcrepo_binary_bucket_access_key" {
-  type    = "string"
+  type = string
 }
 
 variable "fcrepo_binary_bucket_secret_key" {
-  type    = "string"
+  type = string
 }
 
 variable "hosted_zone_name" {
-  type    = "string"
+  type = string
 }
 
 variable "postgres_version" {
@@ -80,21 +80,21 @@ variable "stack_name" {
 }
 
 variable "stack_bucket" {
-  type = "string"
+  type = string
 }
 
 variable "stack_key" {
-  type    = "string"
+  type    = string
   default = "stack.tfstate"
 }
 
 variable "stack_region" {
-  type    = "string"
+  type    = string
   default = "us-east-1"
 }
 
 variable "tags" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
@@ -103,12 +103,12 @@ variable "vpc_cidr_block" {
 }
 
 variable "vpc_public_subnets" {
-  type    = "list"
+  type    = list(string)
   default = ["10.1.2.0/24", "10.1.4.0/24", "10.1.6.0/24"]
 }
 
 variable "vpc_private_subnets" {
-  type    = "list"
+  type    = list(string)
   default = ["10.1.1.0/24", "10.1.3.0/24", "10.1.5.0/24"]
 }
 
@@ -117,12 +117,13 @@ locals {
   public_zone_name  = "${var.environment}.${var.hosted_zone_name}"
   private_zone_name = "vpc.${var.environment}.${var.hosted_zone_name}"
 
-  common_tags = "${merge(
+  common_tags = merge(
     var.tags,
-    map(
-      "Terraform", "true",
-      "Environment", "${local.namespace}",
-      "Project", "Infrastructure"
-    )
-  )}"
+    {
+      "Terraform"   = "true"
+      "Environment" = local.namespace
+      "Project"     = "Infrastructure"
+    },
+  )
 }
+

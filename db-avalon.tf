@@ -1,22 +1,22 @@
 module "db_avalon_password" {
-  source = "modules/password"
+  source = "./modules/password"
 }
 
 module "db_avalon" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "1.28.0"
+  version = "2.8.0"
 
   identifier = "${local.namespace}-avalon-db"
 
   engine         = "postgres"
-  engine_version = "${var.postgres_version}"
+  engine_version = var.postgres_version
 
-  instance_class    = "db.t2.micro"
+  instance_class    = "db.t3.micro"
   allocated_storage = 20
 
   name     = "avalon"
-  username = "${var.db_avalon_username}"
-  password = "${module.db_avalon_password.result}"
+  username = var.db_avalon_username
+  password = module.db_avalon_password.result
   port     = 5432
 
   maintenance_window      = "Mon:00:00-Mon:03:00"
@@ -24,14 +24,14 @@ module "db_avalon" {
   backup_retention_period = 35
   copy_tags_to_snapshot   = true
 
-  vpc_security_group_ids = ["${aws_security_group.db.id}"]
+  vpc_security_group_ids = [aws_security_group.db.id]
+  subnet_ids = module.vpc.private_subnets
 
-  tags = "${local.common_tags}"
-
-  subnet_ids = ["${module.vpc.private_subnets}"]
-
+  tags = local.common_tags
   family = "postgres10"
 
+  apply_immediately = true
+  
   parameters = [
     {
       name  = "client_encoding"
@@ -41,29 +41,30 @@ module "db_avalon" {
 }
 
 resource "aws_ssm_parameter" "db_avalon_host" {
-  name        = "/${local.namespace}-avalon-db/host"
-  value       = "${module.db_avalon.this_db_instance_address}"
-  type        = "String"
-  overwrite   = true
+  name      = "/${local.namespace}-avalon-db/host"
+  value     = module.db_avalon.this_db_instance_address
+  type      = "String"
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_port" {
-  name        = "/${local.namespace}-avalon-db/port"
-  value       = "${module.db_avalon.this_db_instance_port}"
-  type        = "String"
-  overwrite   = true
+  name      = "/${local.namespace}-avalon-db/port"
+  value     = module.db_avalon.this_db_instance_port
+  type      = "String"
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_admin_user" {
-  name        = "/${local.namespace}-avalon-db/admin_user"
-  value       = "${module.db_avalon.this_db_instance_username}"
-  type        = "SecureString"
-  overwrite   = true
+  name      = "/${local.namespace}-avalon-db/admin_user"
+  value     = module.db_avalon.this_db_instance_username
+  type      = "SecureString"
+  overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_admin_password" {
-  name        = "/${local.namespace}-avalon-db/admin_password"
-  value       = "${module.db_avalon.this_db_instance_password}"
-  type        = "SecureString"
-  overwrite   = true
+  name      = "/${local.namespace}-avalon-db/admin_password"
+  value     = module.db_avalon.this_db_instance_password
+  type      = "SecureString"
+  overwrite = true
 }
+

@@ -1,46 +1,46 @@
 # Variable Passthroughs
 
 output "aws_region" {
-  value = "${var.aws_region}"
+  value = var.aws_region
 }
 
 output "azs" {
-  value = "${var.azs}"
+  value = var.azs
 }
 
 output "ec2_keyname" {
-  value = "${var.ec2_keyname}"
+  value = var.ec2_keyname
 }
 
 output "ec2_private_keyfile" {
-  value = "${var.ec2_private_keyfile}"
+  value = var.ec2_private_keyfile
 }
 
 output "environment" {
-  value = "${var.environment}"
+  value = var.environment
 }
 
 output "hosted_zone_name" {
-  value = "${var.hosted_zone_name}"
+  value = var.hosted_zone_name
 }
 
 output "stack_name" {
-  value = "${var.stack_name}"
+  value = var.stack_name
 }
 
 output "subnet_config" {
   value = {
-    public_subnets = "${var.vpc_public_subnets}"
-    private_subnets = "${var.vpc_private_subnets}"
+    public_subnets  = var.vpc_public_subnets
+    private_subnets = var.vpc_private_subnets
   }
 }
 
 output "tags" {
-  value = "${var.tags}"
+  value = var.tags
 }
 
 output "vpc_cidr_block" {
-  value = "${var.vpc_cidr_block}"
+  value = var.vpc_cidr_block
 }
 
 # Security Groups
@@ -67,11 +67,11 @@ output "vpc_cidr_block" {
 # }
 
 output "cache_address" {
-  value = "${aws_route53_record.redis.name}"
+  value = aws_route53_record.redis.name
 }
 
 output "cache_port" {
-  value = "${aws_elasticache_cluster.redis.cache_nodes.0.port}"
+  value = aws_elasticache_cluster.redis.cache_nodes[0].port
 }
 
 # output "zookeeper_address" {
@@ -83,51 +83,51 @@ output "cache_port" {
 # }
 
 output "db_avalon_address" {
-  value = "${module.db_avalon.this_db_instance_address}"
+  value = module.db_avalon.this_db_instance_address
 }
 
 output "db_avalon_port" {
-  value = "${module.db_avalon.this_db_instance_port}"
+  value = module.db_avalon.this_db_instance_port
 }
 
 output "db_avalon_username" {
-  value = "${module.db_avalon.this_db_instance_username}"
+  value = module.db_avalon.this_db_instance_username
 }
 
 output "db_avalon_password" {
-  value = "${module.db_avalon.this_db_instance_password}"
+  value = module.db_avalon.this_db_instance_password
 }
 
 output "db_fcrepo_address" {
-  value = "${module.db_fcrepo.this_db_instance_address}"
+  value = module.db_fcrepo.this_db_instance_address
 }
 
 output "db_fcrepo_port" {
-  value = "${module.db_fcrepo.this_db_instance_port}"
+  value = module.db_fcrepo.this_db_instance_port
 }
 
 output "db_fcrepo_username" {
-  value = "${module.db_fcrepo.this_db_instance_username}"
+  value = module.db_fcrepo.this_db_instance_username
 }
 
 output "db_fcrepo_password" {
-  value = "${module.db_fcrepo.this_db_instance_password}"
+  value = module.db_fcrepo.this_db_instance_password
 }
 
 output "private_subnets" {
-  value = "${module.vpc.private_subnets}"
+  value = module.vpc.private_subnets
 }
 
 output "private_zone_id" {
-  value = "${module.dns.private_zone_id}"
+  value = module.dns.private_zone_id
 }
 
 output "public_subnets" {
-  value = "${module.vpc.public_subnets}"
+  value = module.vpc.public_subnets
 }
 
 output "public_zone_id" {
-  value = "${module.dns.public_zone_id}"
+  value = module.dns.public_zone_id
 }
 
 # output "repo_endpoint" {
@@ -139,5 +139,6 @@ output "public_zone_id" {
 # }
 
 output "vpc_id" {
-  value = "${module.vpc.vpc_id}"
+  value = module.vpc.vpc_id
 }
+
