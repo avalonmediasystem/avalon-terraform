@@ -1,4 +1,3 @@
-
 data "aws_ami" "amzn" {
   most_recent = true
 
@@ -39,45 +38,45 @@ data "aws_iam_policy_document" "compose" {
 
 resource "aws_iam_policy" "this_bucket_policy" {
   name   = "${local.namespace}-compose-bucket-access"
-  policy = "${data.aws_iam_policy_document.this_bucket_access.json}"
+  policy = data.aws_iam_policy_document.this_bucket_access.json
 }
 
 resource "aws_iam_instance_profile" "compose" {
   name = "${local.namespace}-compose-profile"
-  role = "${aws_iam_role.compose.name}"
+  role = aws_iam_role.compose.name
 }
 
 resource "aws_iam_role" "compose" {
   name               = "${local.namespace}-compose-role"
-  assume_role_policy = "${data.aws_iam_policy_document.compose.json}"
+  assume_role_policy = data.aws_iam_policy_document.compose.json
 }
 
 data "aws_iam_policy_document" "compose_api_access" {
   statement {
-    effect    = "Allow"
-    actions   = [
-                  "ec2:DescribeInstances",
-                  "elasticfilesystem:*",
-                  "elastictranscoder:List*",
-                  "elastictranscoder:Read*",
-                  "elastictranscoder:CreatePreset",
-                  "elastictranscoder:ListPresets",
-                  "elastictranscoder:ReadPreset",
-                  "elastictranscoder:ListJobs",
-                  "elastictranscoder:CreateJob",
-                  "elastictranscoder:ReadJob",
-                  "elastictranscoder:CancelJob",
-                  "s3:*",
-                  "ses:SendEmail",
-                  "ses:SendRawEmail",
-                  "cloudwatch:PutMetricData",
-                  "ssm:Get*",
-                  "logs:CreateLogGroup",
-                  "logs:CreateLogStream",
-                  "logs:DescribeLogGroups",
-                  "logs:DescribeLogStreams",
-                  "logs:PutLogEvents",
-                  "logs:PutRetentionPolicy"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "elasticfilesystem:*",
+      "elastictranscoder:List*",
+      "elastictranscoder:Read*",
+      "elastictranscoder:CreatePreset",
+      "elastictranscoder:ListPresets",
+      "elastictranscoder:ReadPreset",
+      "elastictranscoder:ListJobs",
+      "elastictranscoder:CreateJob",
+      "elastictranscoder:ReadJob",
+      "elastictranscoder:CancelJob",
+      "s3:*",
+      "ses:SendEmail",
+      "ses:SendRawEmail",
+      "cloudwatch:PutMetricData",
+      "ssm:Get*",
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents",
+      "logs:PutRetentionPolicy",
     ]
     resources = ["*"]
   }
@@ -85,37 +84,37 @@ data "aws_iam_policy_document" "compose_api_access" {
 
 resource "aws_iam_policy" "compose_api_access" {
   name   = "${local.namespace}-compose-api-access"
-  policy = "${data.aws_iam_policy_document.compose_api_access.json}"
+  policy = data.aws_iam_policy_document.compose_api_access.json
 }
 
 resource "aws_iam_role_policy_attachment" "compose_api_access" {
-  role       = "${aws_iam_role.compose.name}"
-  policy_arn = "${aws_iam_policy.compose_api_access.arn}"
+  role       = aws_iam_role.compose.name
+  policy_arn = aws_iam_policy.compose_api_access.arn
 }
 
 resource "aws_security_group" "compose" {
   name        = "${local.namespace}-compose"
   description = "Compose Host Security Group"
-  vpc_id      = "${module.vpc.vpc_id}"
-  tags        = "${local.common_tags}"
+  vpc_id      = module.vpc.vpc_id
+  tags        = local.common_tags
 }
 
 resource "aws_security_group_rule" "compose_web" {
-  security_group_id = "${aws_security_group.compose.id}"
+  security_group_id = aws_security_group.compose.id
   type              = "ingress"
   from_port         = "80"
   to_port           = "80"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.vpc_cidr_block}"]
+  cidr_blocks       = [var.vpc_cidr_block]
 }
 
 resource "aws_security_group_rule" "compose_streaming" {
-  security_group_id = "${aws_security_group.compose.id}"
+  security_group_id = aws_security_group.compose.id
   type              = "ingress"
   from_port         = "8880"
   to_port           = "8880"
   protocol          = "tcp"
-  cidr_blocks       = ["${var.vpc_cidr_block}"]
+  cidr_blocks       = [var.vpc_cidr_block]
 }
 
 data "http" "myip" {
@@ -123,7 +122,7 @@ data "http" "myip" {
 }
 
 resource "aws_security_group_rule" "compose_ssh" {
-  security_group_id = "${aws_security_group.compose.id}"
+  security_group_id = aws_security_group.compose.id
   type              = "ingress"
   from_port         = "22"
   to_port           = "22"
@@ -132,7 +131,7 @@ resource "aws_security_group_rule" "compose_ssh" {
 }
 
 resource "aws_security_group_rule" "compose_egress" {
-  security_group_id = "${aws_security_group.compose.id}"
+  security_group_id = aws_security_group.compose.id
   type              = "egress"
   from_port         = "0"
   to_port           = "0"
@@ -141,55 +140,60 @@ resource "aws_security_group_rule" "compose_egress" {
 }
 
 resource "aws_security_group_rule" "allow_this_redis_access" {
-  security_group_id        = "${aws_security_group.redis.id}"
+  security_group_id        = aws_security_group.redis.id
   type                     = "ingress"
-  from_port                = "${aws_elasticache_cluster.redis.cache_nodes.0.port}"
-  to_port                  = "${aws_elasticache_cluster.redis.cache_nodes.0.port}"
+  from_port                = aws_elasticache_cluster.redis.cache_nodes[0].port
+  to_port                  = aws_elasticache_cluster.redis.cache_nodes[0].port
   protocol                 = "tcp"
-  source_security_group_id = "${aws_security_group.compose.id}"
+  source_security_group_id = aws_security_group.compose.id
 }
 
 resource "aws_instance" "compose" {
   ami                         = "ami-08b255f35f032a5ea"
-  instance_type               = "${var.compose_instance_type}"
-  key_name                    = "${var.ec2_keyname}"
-  subnet_id                   = "${module.vpc.public_subnets[0]}"
+  instance_type               = var.compose_instance_type
+  key_name                    = var.ec2_keyname
+  subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
-  iam_instance_profile        = "${aws_iam_instance_profile.compose.name}"
-  tags                        = "${merge(local.common_tags, map("Name", "${local.namespace}-compose"))}"
+  iam_instance_profile        = aws_iam_instance_profile.compose.name
+  tags = merge(
+    local.common_tags,
+    {
+      "Name" = "${local.namespace}-compose"
+    },
+  )
 
   root_block_device {
     volume_size = "50"
     volume_type = "standard"
   }
 
-  user_data = "${file("scripts/attach_ebs.sh")}"
+  user_data = file("scripts/attach_ebs.sh")
 
   vpc_security_group_ids = [
-    "${aws_security_group.compose.id}",
-    "${aws_security_group.db_client.id}",
+    aws_security_group.compose.id,
+    aws_security_group.db_client.id,
   ]
 
   lifecycle {
-    ignore_changes = ["ami"]
+    ignore_changes = [ami]
   }
 }
 
 resource "null_resource" "install_docker_on_compose" {
-  triggers {
-    host = "${aws_instance.compose.id}"
+  triggers = {
+    host = aws_instance.compose.id
   }
 
   provisioner "file" {
     connection {
-      host        = "${aws_instance.compose.public_dns}"
+      host        = aws_instance.compose.public_dns
       user        = "ec2-user"
       agent       = true
       timeout     = "10m"
-      private_key = "${file(var.ec2_private_keyfile)}"
+      private_key = file(var.ec2_private_keyfile)
     }
 
-    content     = <<EOF
+    content = <<EOF
 FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${module.db_fcrepo.this_db_instance_address} -Dfcrepo.postgresql.username=${module.db_fcrepo.this_db_instance_username} -Dfcrepo.postgresql.password=${module.db_fcrepo.this_db_instance_password} -Dfcrepo.postgresql.port=${module.db_fcrepo.this_db_instance_port} -Daws.accessKeyId=${var.fcrepo_binary_bucket_access_key} -Daws.secretKey=${var.fcrepo_binary_bucket_secret_key} -Daws.bucket=${aws_s3_bucket.fcrepo_binary_bucket.id}
 FEDORA_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/fedora.log
 
@@ -214,16 +218,18 @@ SETTINGS__EMAIL__SUPPORT=${var.email_support}
 STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
 SETTINGS__STREAMING__HTTP_BASE=https://${aws_route53_record.alb_streaming.fqdn}/avalon
 EOF
+
+
     destination = "/tmp/.env"
   }
 
   provisioner "remote-exec" {
     connection {
-      host        = "${aws_instance.compose.public_dns}"
+      host        = aws_instance.compose.public_dns
       user        = "ec2-user"
       agent       = true
       timeout     = "10m"
-      private_key = "${file(var.ec2_private_keyfile)}"
+      private_key = file(var.ec2_private_keyfile)
     }
 
     inline = [
@@ -232,13 +238,13 @@ EOF
       "sudo chown 8983:8983 /srv/solr_backups",
       "sudo service docker restart",
       "wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip && unzip aws_min.zip",
-      "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d"
+      "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d",
     ]
   }
 }
 
 resource "aws_s3_bucket_policy" "compose-s3" {
-  bucket = "${aws_s3_bucket.this_derivatives.id}"
+  bucket = aws_s3_bucket.this_derivatives.id
 
   policy = <<POLICY
 {
@@ -258,19 +264,21 @@ resource "aws_s3_bucket_policy" "compose-s3" {
   ]
 }
 POLICY
+
 }
 
 resource "aws_cloudwatch_log_group" "compose_log_group" {
-  name = "${local.namespace}"
+  name = local.namespace
 }
 
 resource "aws_volume_attachment" "compose_solr" {
   device_name = "/dev/sdh"
-  volume_id   = "${aws_ebs_volume.solr_data.id}"
-  instance_id = "${aws_instance.compose.id}"
+  volume_id   = aws_ebs_volume.solr_data.id
+  instance_id = aws_instance.compose.id
 }
 
 resource "aws_ebs_volume" "solr_data" {
-  availability_zone = "${var.availability_zone}"
+  availability_zone = var.availability_zone
   size              = 20
 }
+

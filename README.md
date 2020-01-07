@@ -6,7 +6,7 @@ Turnkey solution for Avalon on AWS, using Terraform
 # Getting started
 ## Prerequisites
 
-1. Download and install [Terraform](https://www.terraform.io/downloads.html)
+1. Download and install [Terraform 0.12+](https://www.terraform.io/downloads.html). The scripts have been upgraded to HCL 2 and therefore incompatible with earlier versions of Terraform.
 1. Clone this repo
 1. Create or import an [EC2 key-pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for your region.
 1. Create an S3 bucket to hold the terraform state, this is useful when
@@ -82,3 +82,7 @@ Since Avalon, Fedora, Solr and Nginx are running inside Docker containers manage
     docker-compose pull
     docker-compose up -d
 
+## Performance & Cost
+The EC2 instances are sized to minimize cost and allow occasional bursts (mostly by using `t3`). However if your system is constantly utilizing 30%+ CPU, it might be cheaper & more performant to switch to larger `t2` or `m5` instances.
+
+Cost can be further reduced by using [reserved instances](https://aws.amazon.com/ec2/pricing/reserved-instances/pricing/) - commiting to buy EC2 for months or years.
