@@ -1,5 +1,9 @@
 Turnkey solution for Avalon on AWS, using Terraform
 
+# Goals
+
+The goal of this solution is to provide a simple, cost-effective way to put Avalon on the cloud, while remaining resilient, performant and easy to manage. It aims to serve collections with low to medium traffic.
+
 # Architecture diagram
 ![](diagram.jpg)
 
@@ -86,3 +90,5 @@ Since Avalon, Fedora, Solr and Nginx are running inside Docker containers manage
 The EC2 instances are sized to minimize cost and allow occasional bursts (mostly by using `t3`). However if your system is constantly utilizing 30%+ CPU, it might be cheaper & more performant to switch to larger `t2` or `m5` instances.
 
 Cost can be further reduced by using [reserved instances](https://aws.amazon.com/ec2/pricing/reserved-instances/pricing/) - commiting to buy EC2 for months or years.
+
+Out of the box, the system can service up to 100 concurrent streaming users without serious performance degradation. More performance can be achieved by scaling up using a larger EC2 instance.
