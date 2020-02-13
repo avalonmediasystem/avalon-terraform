@@ -4,7 +4,7 @@ module "db_avalon_password" {
 
 module "db_avalon" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "2.8.0"
+  version = "2.9.0"
 
   identifier = "${local.namespace}-avalon-db"
 
@@ -19,6 +19,7 @@ module "db_avalon" {
   password = module.db_avalon_password.result
   port     = 5432
 
+  option_group_name       = "default:postgres-10"
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_window           = "03:00-06:00"
   backup_retention_period = 35

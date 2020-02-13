@@ -15,6 +15,14 @@ variable "availability_zone" {
   default = "us-east-1a"
 }
 
+variable "avalon_repo" {
+  default = "https://github.com/avalonmediasystem/avalon"
+}
+
+variable "avalon_branch" {
+  default = "demo"
+}
+
 variable "bastion_instance_type" {
   default = "t2.micro"
 }
