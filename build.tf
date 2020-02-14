@@ -129,7 +129,7 @@ resource "aws_codebuild_project" "docker" {
 
   logs_config {
     cloudwatch_logs {
-      group_name  = aws_cloudwatch_log_group.compose_log_group.name
+      group_name  = "${aws_cloudwatch_log_group.compose_log_group.name}/build.log"
       stream_name = "build.log"
     }
   }
@@ -161,6 +161,7 @@ phases:
       - docker-compose push avalon
       - docker tag $AVALON_DOCKER_REPO:$AVALON_REV $AVALON_DOCKER_REPO:latest
       - docker push $AVALON_DOCKER_REPO:latest
+      - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["${aws_instance.compose.id}"]}]' --parameters '{"commands":["$(aws ecr get-login --region ${local.region} --no-include-email) && docker-compose pull avalon && docker-compose up -d avalon"],"workingDirectory":["/home/ec2-user/avalon-docker-aws_min"],"executionTimeout":["360"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"avalon-demo/ssm","CloudWatchOutputEnabled":true}' --region us-east-1
 BUILDSPEC
   }
 

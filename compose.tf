@@ -92,6 +92,11 @@ resource "aws_iam_role_policy_attachment" "compose_api_access" {
   policy_arn = aws_iam_policy.compose_api_access.arn
 }
 
+resource "aws_iam_role_policy_attachment" "compose_ecr" {
+  role       = aws_iam_role.compose.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 resource "aws_security_group" "compose" {
   name        = "${local.namespace}-compose"
   description = "Compose Host Security Group"
