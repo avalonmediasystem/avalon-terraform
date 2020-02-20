@@ -145,8 +145,8 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - AVALON_REV=$(echo $CODEBUILD_BUILD_NUMBER)
-      - AVALON_DOCKER_CACHE_TAG=$(($AVALON_REV-1))
+      - AVALON_REV=`git ls-remote $AVALON_REPO refs/heads/$AVALON_BRANCH | cut -f 1`
+      - AVALON_DOCKER_CACHE_TAG=$AVALON_REV
       - docker pull $AVALON_DOCKER_REPO:$AVALON_DOCKER_CACHE_TAG || docker pull $AVALON_DOCKER_REPO:latest || true
   build:
     commands:
@@ -161,7 +161,7 @@ phases:
       - docker-compose push avalon
       - docker tag $AVALON_DOCKER_REPO:$AVALON_REV $AVALON_DOCKER_REPO:latest
       - docker push $AVALON_DOCKER_REPO:latest
-      - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["${aws_instance.compose.id}"]}]' --parameters '{"commands":["$(aws ecr get-login --region ${local.region} --no-include-email) && docker-compose pull avalon && docker-compose up -d avalon"],"workingDirectory":["/home/ec2-user/avalon-docker-aws_min"],"executionTimeout":["360"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"avalon-demo/ssm","CloudWatchOutputEnabled":true}' --region us-east-1
+      - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["${aws_instance.compose.id}"]}]' --parameters '{"commands":["$(aws ecr get-login --region ${local.region} --no-include-email) && docker-compose pull avalon && docker-compose up -d avalon worker"],"workingDirectory":["/home/ec2-user/avalon-docker-aws_min"],"executionTimeout":["360"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"avalon-demo/ssm","CloudWatchOutputEnabled":true}' --region us-east-1
 BUILDSPEC
   }
 
