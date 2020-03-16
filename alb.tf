@@ -49,7 +49,7 @@ resource "aws_route53_record" "alb" {
   alias {
     name                   = aws_alb.alb.dns_name
     zone_id                = aws_alb.alb.zone_id
-    evaluate_target_health = true
+    evaluate_target_health = false
   }
 }
 
@@ -120,7 +120,7 @@ resource "aws_alb_target_group" "alb_web" {
     healthy_threshold   = 3
     unhealthy_threshold = 10
     timeout             = 5
-    interval            = 10
+    interval            = 30
     path                = "/"
     port                = "80"
   }
@@ -157,8 +157,8 @@ resource "aws_alb_target_group" "alb_streaming" {
     healthy_threshold   = 3
     unhealthy_threshold = 10
     timeout             = 5
-    interval            = 10
-    path                = "/"
+    interval            = 30
+    path                = "/status"
     port                = "8880"
   }
 }
