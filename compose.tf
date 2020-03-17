@@ -202,8 +202,15 @@ resource "null_resource" "install_docker_on_compose" {
 FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${module.db_fcrepo.this_db_instance_address} -Dfcrepo.postgresql.username=${module.db_fcrepo.this_db_instance_username} -Dfcrepo.postgresql.password=${module.db_fcrepo.this_db_instance_password} -Dfcrepo.postgresql.port=${module.db_fcrepo.this_db_instance_port} -Daws.accessKeyId=${var.fcrepo_binary_bucket_access_key} -Daws.secretKey=${var.fcrepo_binary_bucket_secret_key} -Daws.bucket=${aws_s3_bucket.fcrepo_binary_bucket.id}
 FEDORA_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/fedora.log
 
+SOLR_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/solr.log
+
+HLS_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/hls.log
 AVALON_STREAMING_BUCKET=${aws_s3_bucket.this_derivatives.id}
+
 AVALON_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/avalon.log
+WORKER_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/worker.log
+AVALON_DOCKER_REPO=${aws_ecr_repository.avalon.repository_url}
+AVALON_REPO=${var.avalon_repo}
 
 DATABASE_URL=postgres://${module.db_avalon.this_db_instance_username}:${module.db_avalon.this_db_instance_password}@${module.db_avalon.this_db_instance_address}/avalon
 ELASTICACHE_HOST=${aws_route53_record.redis.name}
@@ -223,7 +230,6 @@ SETTINGS__EMAIL__SUPPORT=${var.email_support}
 STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
 SETTINGS__STREAMING__HTTP_BASE=https://${aws_route53_record.alb_streaming.fqdn}/avalon
 EOF
-
 
     destination = "/tmp/.env"
   }
