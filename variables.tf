@@ -83,6 +83,10 @@ variable "postgres_version" {
   default = "10.6"
 }
 
+variable "sms_notification" {
+  type = string
+}
+
 variable "stack_name" {
   default = "stack"
 }
