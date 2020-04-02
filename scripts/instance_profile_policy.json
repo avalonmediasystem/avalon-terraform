@@ -24,8 +24,7 @@
         "logs:PutLogEvents"
       ],
       "Resource": [
-        "${app_log_group_arn}",
-        "${ecs_log_group_arn}"
+        "*"
       ]
     }
   ]

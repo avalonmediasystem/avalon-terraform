@@ -12,9 +12,9 @@ resource "aws_efs_file_system" "solr_backups" {
 }
 
 resource "aws_efs_mount_target" "solr_backups_mount" {
-  #   count           = "${length(var.subnets)}"
+  count           = length(module.vpc.public_subnets)
   file_system_id  = aws_efs_file_system.solr_backups.id
-  subnet_id       = module.vpc.public_subnets[0]
+  subnet_id       = element(module.vpc.public_subnets, count.index)
   security_groups = [aws_security_group.efs_sgroup.id]
 }
 

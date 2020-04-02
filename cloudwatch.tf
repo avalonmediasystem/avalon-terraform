@@ -50,3 +50,13 @@ resource "aws_cloudwatch_metric_alarm" "alb_streaming_healthyhosts" {
 #     InstanceId = aws_instance.compose.id
 #   }
 # }
+
+## CloudWatch Logs
+
+resource "aws_cloudwatch_log_group" "ecs" {
+  name = "${local.namespace}/ecs-agent"
+}
+
+resource "aws_cloudwatch_log_group" "app" {
+  name = "${local.namespace}/app-ghost"
+}

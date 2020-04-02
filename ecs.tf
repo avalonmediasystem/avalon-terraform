@@ -11,6 +11,22 @@ resource "aws_autoscaling_group" "app" {
   launch_configuration = aws_launch_configuration.app.name
 }
 
+# resource "aws_ecs_capacity_provider" "test" {
+#   name = "test"
+
+#   auto_scaling_group_provider {
+#     auto_scaling_group_arn         = aws_autoscaling_group.app.arn
+#     managed_termination_protection = "ENABLED"
+
+#     managed_scaling {
+#       maximum_scaling_step_size = 1000
+#       minimum_scaling_step_size = 1
+#       status                    = "ENABLED"
+#       target_capacity           = 10
+#     }
+#   }
+# }
+
 data "template_file" "cloud_config" {
   template = file("${path.module}/scripts/cloud_config.yml")
 
@@ -122,6 +138,8 @@ resource "aws_ecs_cluster" "main" {
   name = "${local.namespace}-cluster"
 }
 
+# Don't group unrelated containers into 1 task definition 
+# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/application_architecture.html
 data "template_file" "task_definition" {
   template = file("${path.module}/scripts/task_definition.json")
   
@@ -244,7 +262,7 @@ resource "aws_iam_role_policy" "instance" {
   policy = data.template_file.instance_profile.rendered
 }
 
-# ## ALB
+## ALB
 
 resource "aws_alb_target_group" "test" {
   name     = "tf-example-ecs-ghost"
@@ -262,14 +280,4 @@ resource "aws_alb_listener" "front_end" {
     target_group_arn = aws_alb_target_group.test.id
     type             = "forward"
   }
-}
-
-## CloudWatch Logs
-
-resource "aws_cloudwatch_log_group" "ecs" {
-  name = "${local.namespace}/ecs-agent"
-}
-
-resource "aws_cloudwatch_log_group" "app" {
-  name = "${local.namespace}/app-ghost"
 }
