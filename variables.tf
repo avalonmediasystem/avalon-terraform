@@ -2,13 +2,13 @@ variable "app_name" {
   default = "avalon"
 }
 
+variable "aws_region" {
+  default = "us-east-1"
+}
+
 variable "azs" {
   type    = list(string)
   default = ["us-east-1a", "us-east-1b", "us-east-1c"]
-}
-
-variable "aws_region" {
-  default = "us-east-1"
 }
 
 variable "availability_zone" {
@@ -23,12 +23,20 @@ variable "avalon_branch" {
   default = "demo"
 }
 
-variable "bastion_instance_type" {
-  default = "t2.micro"
+variable "autoscale_min" {
+  default = 1
 }
 
-variable "compose_instance_type" {
-  default = "t3.large"
+variable "autoscale_max" {
+  default = 2
+}
+
+variable "autoscale_desired" {
+  default = 1
+}
+
+variable "bastion_instance_type" {
+  default = "t2.micro"
 }
 
 variable "db_avalon_username" {
@@ -45,6 +53,10 @@ variable "ec2_keyname" {
 
 variable "ec2_private_keyfile" {
   type = string
+}
+
+variable "ecs_instance_type" {
+  default = "t3.large"
 }
 
 variable "email_comments" {

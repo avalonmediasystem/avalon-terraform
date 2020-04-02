@@ -36,17 +36,17 @@ resource "aws_cloudwatch_metric_alarm" "alb_streaming_healthyhosts" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "compose_cpu" {
-  alarm_name                = "${local.namespace}-ec2-cpu-80"
-  comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "2"
-  metric_name               = "CPUUtilization"
-  namespace                 = "AWS/EC2"
-  period                    = "120"
-  statistic                 = "Average"
-  threshold                 = "80"
-  alarm_description         = "This metric monitors ec2 cpu utilization"
-  dimensions = {
-    InstanceId = aws_instance.compose.id
-  }
-}
+# resource "aws_cloudwatch_metric_alarm" "compose_cpu" {
+#   alarm_name                = "${local.namespace}-ec2-cpu-80"
+#   comparison_operator       = "GreaterThanOrEqualToThreshold"
+#   evaluation_periods        = "2"
+#   metric_name               = "CPUUtilization"
+#   namespace                 = "AWS/EC2"
+#   period                    = "120"
+#   statistic                 = "Average"
+#   threshold                 = "80"
+#   alarm_description         = "This metric monitors ec2 cpu utilization"
+#   dimensions = {
+#     InstanceId = aws_instance.compose.id
+#   }
+# }
