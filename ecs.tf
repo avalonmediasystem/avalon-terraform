@@ -79,30 +79,6 @@ resource "aws_launch_configuration" "app" {
 
 # ### Security
 
-# resource "aws_security_group" "lb_sg" {
-#   description = "controls access to the application ELB"
-
-#   vpc_id = "${aws_vpc.main.id}"
-#   name   = "tf-ecs-lbsg"
-
-#   ingress {
-#     protocol    = "tcp"
-#     from_port   = 80
-#     to_port     = 80
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   egress {
-#     from_port = 0
-#     to_port   = 0
-#     protocol  = "-1"
-
-#     cidr_blocks = [
-#       "0.0.0.0/0",
-#     ]
-#   }
-# }
-
 resource "aws_security_group" "instance_sg" {
   description = "controls direct access to application instances"
   vpc_id      = module.vpc.vpc_id
@@ -138,41 +114,10 @@ resource "aws_ecs_cluster" "main" {
   name = "${local.namespace}-cluster"
 }
 
-# Don't group unrelated containers into 1 task definition 
-# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/application_architecture.html
-data "template_file" "task_definition" {
-  template = file("${path.module}/scripts/task_definition.json")
-  
-  vars = {
-    image_url        = "ghost:latest"
-    container_name   = "ghost"
-    log_group_region = var.aws_region
-    log_group_name   = aws_cloudwatch_log_group.app.name
-  }
-}
-
-resource "aws_ecs_task_definition" "ghost" {
-  family                = "tf_example_ghost_td"
-  container_definitions = data.template_file.task_definition.rendered
-}
-
-resource "aws_ecs_service" "test" {
-  name            = "tf-example-ecs-ghost"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.ghost.arn
-  desired_count   = 1
-  iam_role        = aws_iam_role.ecs_service.name
-
-  load_balancer {
-    target_group_arn = aws_alb_target_group.test.id
-    container_name   = "ghost"
-    container_port   = "2368"
-  }
-
-  depends_on = [
-    aws_iam_role_policy.ecs_service,
-    aws_alb_listener.front_end,
-  ]
+resource "aws_service_discovery_private_dns_namespace" "local" {
+  name        = "${local.namespace}-local"
+  description = "Local namespace"
+  vpc         = module.vpc.vpc_id
 }
 
 ## IAM
@@ -260,24 +205,4 @@ resource "aws_iam_role_policy" "instance" {
   name   = "${local.namespace}-ecs-instance-policy"
   role   = aws_iam_role.app_instance.name
   policy = data.template_file.instance_profile.rendered
-}
-
-## ALB
-
-resource "aws_alb_target_group" "test" {
-  name     = "tf-example-ecs-ghost"
-  port     = 8080
-  protocol = "HTTP"
-  vpc_id   = module.vpc.vpc_id
-}
-
-resource "aws_alb_listener" "front_end" {
-  load_balancer_arn = aws_alb.alb.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_alb_target_group.test.id
-    type             = "forward"
-  }
 }

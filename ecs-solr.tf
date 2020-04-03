@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "solr_task_def" {
     "portMappings": [
       {
         "containerPort": 8983,
-        "hostPort": 8983
+        "hostPort": 0
       }
     ],
     "logConfiguration": {
@@ -55,9 +55,34 @@ resource "aws_ecs_service" "solr_service" {
   #   container_port   = "8983"
   # }
 
+  service_registries {
+    registry_arn = aws_service_discovery_service.solr.arn
+    container_port = 8983
+    container_name = "solr"
+  }
+
   depends_on = [
     aws_iam_role_policy.ecs_service,
   ]
+}
+
+resource "aws_service_discovery_service" "solr" {
+  name = "${local.namespace}-solr"
+
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.local.id
+
+    dns_records {
+      ttl  = 10
+      type = "SRV"
+    }
+
+    routing_policy = "MULTIVALUE"
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
 }
 
 resource "aws_cloudwatch_log_group" "solr" {
