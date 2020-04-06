@@ -2,20 +2,20 @@
 
 ### Compute
 
-resource "aws_autoscaling_group" "app" {
-  name                 = "tf-test-asg"
+resource "aws_autoscaling_group" "ecs" {
+  name                 = "${local.namespace}-asg-ecs"
   vpc_zone_identifier  = module.vpc.public_subnets
   min_size             = var.autoscale_min
   max_size             = var.autoscale_max
   desired_capacity     = var.autoscale_desired
-  launch_configuration = aws_launch_configuration.app.name
+  launch_configuration = aws_launch_configuration.ecs_ec2.name
 }
 
-# resource "aws_ecs_capacity_provider" "test" {
-#   name = "test"
+# resource "aws_ecs_capacity_provider" "app" {
+#   name = "${local.namespace}-cap-app"
 
 #   auto_scaling_group_provider {
-#     auto_scaling_group_arn         = aws_autoscaling_group.app.arn
+#     auto_scaling_group_arn         = aws_autoscaling_group.ecs.arn
 #     managed_termination_protection = "ENABLED"
 
 #     managed_scaling {
@@ -60,9 +60,9 @@ data "aws_ami" "stable_coreos" {
   owners = ["595879546273"] # CoreOS
 }
 
-resource "aws_launch_configuration" "app" {
+resource "aws_launch_configuration" "ecs_ec2" {
   security_groups = [
-    "${aws_security_group.instance_sg.id}",
+    aws_security_group.instance_sg.id,  aws_security_group.db_client.id
   ]
 
   key_name                    = var.ec2_keyname
@@ -78,6 +78,9 @@ resource "aws_launch_configuration" "app" {
 }
 
 # ### Security
+data "http" "myip" {
+  url = "http://ipv4.icanhazip.com"
+}
 
 resource "aws_security_group" "instance_sg" {
   description = "controls direct access to application instances"
@@ -89,7 +92,8 @@ resource "aws_security_group" "instance_sg" {
     from_port = 22
     to_port   = 22
 
-    cidr_blocks = [var.vpc_cidr_block]
+    # cidr_blocks = [var.vpc_cidr_block]
+    cidr_blocks = ["${chomp(data.http.myip.body)}/32"]
   }
 
   ingress {
