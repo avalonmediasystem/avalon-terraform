@@ -47,13 +47,6 @@ resource "aws_ecs_service" "solr_service" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.solr_task_def.arn
   desired_count   = 1
-  # iam_role        = aws_iam_role.ecs_service.name
-
-  # load_balancer {
-  #   target_group_arn = aws_alb_target_group.test.id
-  #   container_name   = "solr"
-  #   container_port   = "8983"
-  # }
 
   service_registries {
     registry_arn = aws_service_discovery_service.solr.arn
