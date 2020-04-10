@@ -11,21 +11,21 @@ resource "aws_autoscaling_group" "ecs" {
   launch_configuration = aws_launch_configuration.ecs_ec2.name
 }
 
-# resource "aws_ecs_capacity_provider" "app" {
-#   name = "${local.namespace}-cap-app"
+resource "aws_ecs_capacity_provider" "stack" {
+  name = "${local.namespace}-cap-stack"
 
-#   auto_scaling_group_provider {
-#     auto_scaling_group_arn         = aws_autoscaling_group.ecs.arn
-#     managed_termination_protection = "ENABLED"
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.ecs.arn
+    managed_termination_protection = "DISABLED"
 
-#     managed_scaling {
-#       maximum_scaling_step_size = 1000
-#       minimum_scaling_step_size = 1
-#       status                    = "ENABLED"
-#       target_capacity           = 10
-#     }
-#   }
-# }
+    managed_scaling {
+      maximum_scaling_step_size = 100
+      minimum_scaling_step_size = 1
+      status                    = "ENABLED"
+      target_capacity           = 50
+    }
+  }
+}
 
 data "template_file" "cloud_config" {
   template = file("${path.module}/scripts/cloud_config.yml")
@@ -100,7 +100,7 @@ resource "aws_security_group" "instance_sg" {
     protocol  = "tcp"
     from_port = 32768
     to_port   = 61000
-
+    self      = true
     security_groups = [aws_security_group.alb.id,]
   }
 
@@ -116,6 +116,8 @@ resource "aws_security_group" "instance_sg" {
 
 resource "aws_ecs_cluster" "main" {
   name = "${local.namespace}-cluster"
+
+  # capacity_providers = [aws_ecs_capacity_provider.stack.name]
 }
 
 resource "aws_service_discovery_private_dns_namespace" "local" {

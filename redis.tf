@@ -1,14 +1,21 @@
 resource "aws_security_group" "redis" {
   vpc_id = module.vpc.vpc_id
-}
+  # name = "${local.namespace}-redis-sg"
 
-resource "aws_security_group_rule" "redis_egress" {
-  security_group_id = aws_security_group.redis.id
-  type              = "egress"
-  from_port         = "0"
-  to_port           = "0"
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
+  ingress {
+    protocol  = "tcp"
+    from_port = "6379" #aws_elasticache_cluster.redis.cache_nodes[0].port
+    to_port   = "6379" #aws_elasticache_cluster.redis.cache_nodes[0].port
+
+    security_groups = [aws_security_group.instance_sg.id,]
+  }
+
+  egress {
+    protocol          = "-1"
+    from_port         = "0"
+    to_port           = "0"
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_elasticache_subnet_group" "redis" {
