@@ -26,11 +26,14 @@ resource "aws_ecs_task_definition" "worker_task_def" {
       {"name": "SETTINGS__FFMPEG__PATH", "value": "/usr/bin/ffmpeg"},
       {"name": "SETTINGS__ENCODING__ENGINE_ADAPTER", "value": "elastic_transcoder"},
       {"name": "SETTINGS__ENCODING__PIPELINE", "value": "${aws_elastictranscoder_pipeline.this_pipeline.id}"},
+      {"name": "SETTINGS__EMAIL__MAILER", "value": "aws_sdk"},
       {"name": "SETTINGS__EMAIL__COMMENTS", "value": "${var.email_comments}"},
       {"name": "SETTINGS__EMAIL__NOTIFICATION", "value": "${var.email_notification}"},
       {"name": "SETTINGS__EMAIL__SUPPORT", "value": "${var.email_support}"},
-      {"name": "STREAMING_HOST", "value": "${aws_route53_record.alb_streaming.fqdn}"},
-      {"name": "SETTINGS__STREAMING__HTTP_BASE", "value": "https://${aws_route53_record.alb_streaming.fqdn}/avalon"}
+      {"name": "SETTINGS__STREAMING__CONTENT_PATH", "value": "/"},
+      {"name": "SETTINGS__STREAMING__SERVER", "value": "nginx"},
+      {"name": "SETTINGS__STREAMING__HTTP_BASE", "value": "https://${aws_route53_record.alb_streaming.fqdn}/avalon"},
+      {"name": "STREAMING_HOST", "value": "${aws_route53_record.alb_streaming.fqdn}"}
     ],
     "logConfiguration": {
         "logDriver": "awslogs",

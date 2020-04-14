@@ -173,6 +173,47 @@ resource "aws_iam_role_policy" "ecs_service" {
 EOF
 }
 
+data "aws_iam_policy_document" "avalon_api_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "elasticfilesystem:*",
+      "elastictranscoder:List*",
+      "elastictranscoder:Read*",
+      "elastictranscoder:CreatePreset",
+      "elastictranscoder:ListPresets",
+      "elastictranscoder:ReadPreset",
+      "elastictranscoder:ListJobs",
+      "elastictranscoder:CreateJob",
+      "elastictranscoder:ReadJob",
+      "elastictranscoder:CancelJob",
+      "s3:*",
+      "ses:SendEmail",
+      "ses:SendRawEmail",
+      "cloudwatch:PutMetricData",
+      "ssm:Get*",
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents",
+      "logs:PutRetentionPolicy",
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "avalon_api_access" {
+  name   = "${local.namespace}-avalon-api-access"
+  policy = data.aws_iam_policy_document.avalon_api_access.json
+}
+
+resource "aws_iam_role_policy_attachment" "avalon_api_access" {
+  role       = aws_iam_role.app_instance.name
+  policy_arn = aws_iam_policy.avalon_api_access.arn
+}
+
 resource "aws_iam_instance_profile" "app" {
   name = "${local.namespace}-ecs-instance-profile"
   role = aws_iam_role.app_instance.name

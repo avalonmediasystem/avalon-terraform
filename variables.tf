@@ -32,7 +32,7 @@ variable "autoscale_max" {
 }
 
 variable "autoscale_desired" {
-  default = 1
+  default = 2
 }
 
 variable "bastion_instance_type" {

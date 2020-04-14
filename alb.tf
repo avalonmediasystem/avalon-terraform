@@ -96,7 +96,7 @@ resource "aws_lb_listener_rule" "alb_streaming_listener_rule" {
 
 resource "aws_alb_target_group" "alb_streaming" {
   name     = "${local.namespace}-alb-streaming"
-  port     = "8880"
+  port     = "80"
   protocol = "HTTP"
   vpc_id   = module.vpc.vpc_id
 
@@ -111,7 +111,6 @@ resource "aws_alb_target_group" "alb_streaming" {
     timeout             = 5
     interval            = 30
     path                = "/status"
-    port                = "8880"
   }
 }
 

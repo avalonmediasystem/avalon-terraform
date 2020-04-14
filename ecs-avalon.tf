@@ -25,11 +25,14 @@ resource "aws_ecs_task_definition" "avalon_task_def" {
       {"name": "SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY", "value": "MOVE"},
       {"name": "SETTINGS__ENCODING__ENGINE_ADAPTER", "value": "elastic_transcoder"},
       {"name": "SETTINGS__ENCODING__PIPELINE", "value": "${aws_elastictranscoder_pipeline.this_pipeline.id}"},
+      {"name": "SETTINGS__EMAIL__MAILER", "value": "aws_sdk"},
       {"name": "SETTINGS__EMAIL__COMMENTS", "value": "${var.email_comments}"},
       {"name": "SETTINGS__EMAIL__NOTIFICATION", "value": "${var.email_notification}"},
       {"name": "SETTINGS__EMAIL__SUPPORT", "value": "${var.email_support}"},
-      {"name": "STREAMING_HOST", "value": "${aws_route53_record.alb_streaming.fqdn}"},
-      {"name": "SETTINGS__STREAMING__HTTP_BASE", "value": "https://${aws_route53_record.alb_streaming.fqdn}/avalon"}
+      {"name": "SETTINGS__STREAMING__CONTENT_PATH", "value": "/"},
+      {"name": "SETTINGS__STREAMING__SERVER", "value": "nginx"},
+      {"name": "SETTINGS__STREAMING__HTTP_BASE", "value": "https://${aws_route53_record.alb_streaming.fqdn}/avalon"},
+      {"name": "STREAMING_HOST", "value": "${aws_route53_record.alb_streaming.fqdn}"}
     ],
     "portMappings": [
       {
@@ -47,47 +50,6 @@ resource "aws_ecs_task_definition" "avalon_task_def" {
   }
 ]
 TASK_DEFINITION
-}
-
-data "aws_iam_policy_document" "avalon_api_access" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:DescribeInstances",
-      "elasticfilesystem:*",
-      "elastictranscoder:List*",
-      "elastictranscoder:Read*",
-      "elastictranscoder:CreatePreset",
-      "elastictranscoder:ListPresets",
-      "elastictranscoder:ReadPreset",
-      "elastictranscoder:ListJobs",
-      "elastictranscoder:CreateJob",
-      "elastictranscoder:ReadJob",
-      "elastictranscoder:CancelJob",
-      "s3:*",
-      "ses:SendEmail",
-      "ses:SendRawEmail",
-      "cloudwatch:PutMetricData",
-      "ssm:Get*",
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:DescribeLogGroups",
-      "logs:DescribeLogStreams",
-      "logs:PutLogEvents",
-      "logs:PutRetentionPolicy",
-    ]
-    resources = ["*"]
-  }
-}
-
-resource "aws_iam_policy" "avalon_api_access" {
-  name   = "${local.namespace}-avalon-api-access"
-  policy = data.aws_iam_policy_document.avalon_api_access.json
-}
-
-resource "aws_iam_role_policy_attachment" "avalon_api_access" {
-  role       = aws_iam_role.app_instance.name
-  policy_arn = aws_iam_policy.avalon_api_access.arn
 }
 
 resource "aws_ecs_service" "avalon_service" {
@@ -163,44 +125,12 @@ resource "aws_lb_listener_rule" "alb_web_listener_rule" {
   }
 }
 
-# resource "aws_alb_target_group" "alb_web" {
-#   name     = "${local.namespace}-alb-web"
-#   port     = "80"
-#   protocol = "HTTP"
-#   vpc_id   = module.vpc.vpc_id
-
-#   stickiness {
-#     type            = "lb_cookie"
-#     cookie_duration = 1800
-#     enabled         = "true"
-#   }
-#   health_check {
-#     healthy_threshold   = 3
-#     unhealthy_threshold = 10
-#     timeout             = 5
-#     interval            = 30
-#     path                = "/"
-#     port                = "80"
-#   }
-# }
-
 resource "aws_alb_target_group" "alb_web" {
   name     = "${local.namespace}-ecs-avalon"
   port     = 3000
   protocol = "HTTP"
   vpc_id   = module.vpc.vpc_id
 }
-
-# resource "aws_alb_listener" "front_end" {
-#   load_balancer_arn = aws_alb.alb.arn
-#   port              = "80"
-#   protocol          = "HTTP"
-
-#   default_action {
-#     target_group_arn = aws_alb_target_group.avalon.id
-#     type             = "forward"
-#   }
-# }
 
 resource "aws_cloudwatch_log_group" "avalon" {
   name = "${local.namespace}/avalon"
