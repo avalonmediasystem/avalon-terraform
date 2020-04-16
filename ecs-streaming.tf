@@ -2,23 +2,45 @@
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/application_architecture.html
 resource "aws_ecs_task_definition" "streaming_task_def" {
   family                = "${local.namespace}_streaming_task_def"
+  network_mode          = "bridge"
   container_definitions = <<TASK_DEFINITION
 [
   {
     "cpu": 256,
     "essential": true,
-    "image": "avalonmediasystem/nginx:aws",
-    "memory": 512,
-    "name": "streaming",
+    "image": "avalonmediasystem/nginx:ecs",
+    "memory": 256,
+    "name": "streaming",      
+    "links": [
+      "s3helper"
+    ],
     "environment": [
-      {"name": "AVALON_DOMAIN", "value": "${aws_route53_record.alb.fqdn}"},
-      {"name": "AVALON_STREAMING_BUCKET", "value": "${aws_s3_bucket.this_derivatives.id}"}
+      {"name": "AUTH_URL", "value": "https://${aws_route53_record.alb.fqdn}"},
+      {"name": "PROXY_PASS_URL", "value": "http://s3helper:8080/"}
     ],
     "portMappings": [
       {
         "containerPort": 80,
         "hostPort": 0
       }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+          "awslogs-group": "${aws_cloudwatch_log_group.streaming.name}",
+          "awslogs-region": "${var.aws_region}"
+      }
+    }
+  },
+  {
+    "cpu": 256,
+    "essential": true,
+    "image": "avalonmediasystem/evs-s3helper",
+    "memory": 256,
+    "name": "s3helper",
+    "environment": [
+      {"name": "S3_REGION", "value": "${var.aws_region}"},
+      {"name": "S3_BUCKET", "value": "${aws_s3_bucket.this_derivatives.id}"}
     ],
     "logConfiguration": {
         "logDriver": "awslogs",
