@@ -1,4 +1,6 @@
-## EC2
+locals {
+  cluster_name = "${local.namespace}-cluster"
+}
 
 ### Compute
 
@@ -32,7 +34,7 @@ data "template_file" "cloud_config" {
 
   vars = {
     aws_region         = var.aws_region
-    ecs_cluster_name   = aws_ecs_cluster.main.name
+    ecs_cluster_name   = local.cluster_name
     ecs_log_level      = "info"
     ecs_agent_version  = "latest"
     ecs_log_group_name = aws_cloudwatch_log_group.ecs.name
@@ -115,9 +117,9 @@ resource "aws_security_group" "instance_sg" {
 ## ECS
 
 resource "aws_ecs_cluster" "main" {
-  name = "${local.namespace}-cluster"
+  name = local.cluster_name
 
-  # capacity_providers = [aws_ecs_capacity_provider.stack.name]
+  capacity_providers = [aws_ecs_capacity_provider.stack.name]
 }
 
 resource "aws_service_discovery_private_dns_namespace" "local" {

@@ -28,7 +28,7 @@ variable "autoscale_min" {
 }
 
 variable "autoscale_max" {
-  default = 2
+  default = 4
 }
 
 variable "autoscale_desired" {

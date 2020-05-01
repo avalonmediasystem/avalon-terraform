@@ -74,3 +74,28 @@ resource "aws_ecs_service" "streaming_service" {
 resource "aws_cloudwatch_log_group" "streaming" {
   name = "${local.namespace}/streaming"
 }
+
+resource "aws_appautoscaling_target" "ecs_streaming" {
+  max_capacity       = 4
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.streaming_service.name}"
+  role_arn           = aws_iam_role.ecs_service.arn
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_streaming" {
+  name               = "${local.namespace}-scale-streaming"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_streaming.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_streaming.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_streaming.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
+    target_value            = 75
+  }
+}
