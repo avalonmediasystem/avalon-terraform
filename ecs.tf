@@ -17,6 +17,12 @@ resource "aws_autoscaling_group" "ecs" {
     ignore_changes = [desired_capacity]
     create_before_destroy = true
   }
+
+  tag {
+    key                 = "Name"
+    value               = "${local.namespace}-ecs"
+    propagate_at_launch = true
+  }
 }
 
 resource "aws_ecs_capacity_provider" "stack" {

@@ -59,6 +59,12 @@ resource "aws_ecs_service" "avalon_service" {
   desired_count   = 1
   # iam_role        = aws_iam_role.ecs_service.name
 
+  capacity_provider_strategy {
+    base              = 1
+    capacity_provider = aws_ecs_capacity_provider.stack.name
+    weight            = 1
+  }
+
   load_balancer {
     target_group_arn = aws_alb_target_group.alb_web.id
     container_name   = "avalon"
@@ -69,6 +75,11 @@ resource "aws_ecs_service" "avalon_service" {
     registry_arn = aws_service_discovery_service.avalon.arn
     container_port = 3000
     container_name = "avalon"
+  }
+
+  ordered_placement_strategy {
+    type  = "binpack"
+    field = "cpu"
   }
 
   depends_on = [

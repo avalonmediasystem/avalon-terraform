@@ -60,10 +60,21 @@ resource "aws_ecs_service" "streaming_service" {
   task_definition = aws_ecs_task_definition.streaming_task_def.arn
   desired_count   = 1
 
+  capacity_provider_strategy {
+    base              = 1
+    capacity_provider = aws_ecs_capacity_provider.stack.name
+    weight            = 1
+  }
+
   load_balancer {
     target_group_arn = aws_alb_target_group.alb_streaming.id
     container_name   = "streaming"
     container_port   = "80"
+  }
+
+  ordered_placement_strategy {
+    type  = "binpack"
+    field = "cpu"
   }
 
   depends_on = [
