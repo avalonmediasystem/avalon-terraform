@@ -5,26 +5,32 @@ locals {
 ### Compute
 
 resource "aws_autoscaling_group" "ecs" {
-  name                 = "${local.namespace}-asg-ecs"
-  vpc_zone_identifier  = module.vpc.public_subnets
-  min_size             = var.autoscale_min
-  max_size             = var.autoscale_max
-  desired_capacity     = var.autoscale_desired
-  launch_configuration = aws_launch_configuration.ecs_ec2.name
+  name                  = "${local.namespace}-asg-ecs1"
+  vpc_zone_identifier   = module.vpc.public_subnets
+  min_size              = 0 #var.autoscale_min
+  max_size              = var.autoscale_max
+  desired_capacity      = 0 #var.autoscale_desired
+  launch_configuration  = aws_launch_configuration.ecs_ec2.name
+  protect_from_scale_in = true
+
+  lifecycle {
+    ignore_changes = [desired_capacity]
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecs_capacity_provider" "stack" {
-  name = "${local.namespace}-cap-stack"
+  name = "${local.namespace}-cap-demand1"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn         = aws_autoscaling_group.ecs.arn
-    managed_termination_protection = "DISABLED"
+    managed_termination_protection = "ENABLED"
 
     managed_scaling {
-      maximum_scaling_step_size = 100
+      maximum_scaling_step_size = 1000
       minimum_scaling_step_size = 1
       status                    = "ENABLED"
-      target_capacity           = 50
+      target_capacity           = 100
     }
   }
 }
@@ -120,6 +126,11 @@ resource "aws_ecs_cluster" "main" {
   name = local.cluster_name
 
   capacity_providers = [aws_ecs_capacity_provider.stack.name]
+  default_capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.stack.name
+    weight            = 1
+    base              = 1
+  }
 }
 
 resource "aws_service_discovery_private_dns_namespace" "local" {
@@ -161,6 +172,7 @@ resource "aws_iam_role_policy" "ecs_service" {
     {
       "Effect": "Allow",
       "Action": [
+        "autoscaling:CreateOrUpdateTags",
         "ec2:Describe*",
         "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
         "elasticloadbalancing:DeregisterTargets",

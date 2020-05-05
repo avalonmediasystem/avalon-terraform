@@ -51,7 +51,7 @@ resource "aws_ecs_service" "worker_service" {
   name            = "${local.namespace}-ecs-worker"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.worker_task_def.arn
-  desired_count   = 2
+  desired_count   = 1
 
   depends_on = [
     aws_iam_role_policy.ecs_service,

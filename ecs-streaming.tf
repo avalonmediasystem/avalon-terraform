@@ -79,7 +79,7 @@ resource "aws_appautoscaling_target" "ecs_streaming" {
   max_capacity       = 4
   min_capacity       = 1
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.streaming_service.name}"
-  role_arn           = aws_iam_role.ecs_service.arn
+  # role_arn           = aws_iam_role.ecs_service.arn
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
@@ -96,6 +96,6 @@ resource "aws_appautoscaling_policy" "ecs_streaming" {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
 
-    target_value            = 75
+    target_value = 40
   }
 }
