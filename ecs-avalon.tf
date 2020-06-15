@@ -18,6 +18,7 @@ resource "aws_ecs_task_definition" "avalon_task_def" {
       {"name": "SOLR_URL", "value": "http://avalon-dev-solr.avalon-dev-local/solr/avalon"},
       {"name": "SETTINGS__REDIS__HOST", "value": "${aws_route53_record.redis.name}"},
       {"name": "RAILS_LOG_TO_STDOUT", "value": "true"},
+      {"name": "RAILS_SERVE_STATIC_FILES", "value": "true"},
       {"name": "SETTINGS__DOMAIN", "value": "https://${aws_route53_record.alb.fqdn}"},
       {"name": "SETTINGS__DROPBOX__PATH", "value": "s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/"},
       {"name": "SETTINGS__DROPBOX__UPLOAD_URI", "value": "s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/"},
@@ -148,7 +149,7 @@ resource "aws_cloudwatch_log_group" "avalon" {
 }
 
 resource "aws_appautoscaling_target" "ecs_avalon" {
-  max_capacity       = 4
+  max_capacity       = 8
   min_capacity       = 1
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.avalon_service.name}"
   # role_arn           = aws_iam_role.ecs_service.arn

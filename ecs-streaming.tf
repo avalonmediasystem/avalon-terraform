@@ -87,7 +87,7 @@ resource "aws_cloudwatch_log_group" "streaming" {
 }
 
 resource "aws_appautoscaling_target" "ecs_streaming" {
-  max_capacity       = 4
+  max_capacity       = 8
   min_capacity       = 1
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.streaming_service.name}"
   # role_arn           = aws_iam_role.ecs_service.arn
