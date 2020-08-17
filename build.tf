@@ -105,7 +105,7 @@ resource "aws_codebuild_project" "docker" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_MEDIUM"
-    image                       = "aws/codebuild/standard:1.0"
+    image                       = "aws/codebuild/standard:2.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
@@ -150,16 +150,13 @@ phases:
       - docker pull $AVALON_DOCKER_REPO:$AVALON_DOCKER_CACHE_TAG || docker pull $AVALON_DOCKER_REPO:latest || true
   build:
     commands:
-       - wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip
-       - unzip aws_min.zip
-       - cd avalon-docker-aws_min
-       - docker-compose build avalon
+       - git clone -b $AVALON_BRANCH --single-branch $AVALON_REPO
+       - DOCKER_BUILDKIT=1 docker build -t $AVALON_DOCKER_REPO:$AVALON_REV -t $AVALON_DOCKER_REPO:latest --target=prod avalon
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker-compose push avalon
-      - docker tag $AVALON_DOCKER_REPO:$AVALON_REV $AVALON_DOCKER_REPO:latest
+      - docker push $AVALON_DOCKER_REPO:$AVALON_REV 
       - docker push $AVALON_DOCKER_REPO:latest
       - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["${aws_instance.compose.id}"]}]' --parameters '{"commands":["$(aws ecr get-login --region ${local.region} --no-include-email) && docker-compose pull avalon && docker-compose up -d avalon worker"],"workingDirectory":["/home/ec2-user/avalon-docker-aws_min"],"executionTimeout":["360"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"avalon-demo/ssm","CloudWatchOutputEnabled":true}' --region us-east-1
 BUILDSPEC
