@@ -110,6 +110,10 @@ variable "tags" {
   default = {}
 }
 
+variable "ssh_cidr_block" {
+  type = string
+}
+
 variable "vpc_cidr_block" {
   default = "10.1.0.0/16"
 }
