@@ -3,7 +3,7 @@ data "aws_ami" "amzn" {
 
   filter {
     name   = "name"
-    values = ["amzn-ami-hvm-*"]
+    values = ["amzn2-ami-hvm-*"]
   }
 
   filter {
@@ -154,7 +154,7 @@ resource "aws_security_group_rule" "allow_this_redis_access" {
 }
 
 resource "aws_instance" "compose" {
-  ami                         = "ami-08b255f35f032a5ea"
+  ami                         = data.aws_ami.amzn.id
   instance_type               = var.compose_instance_type
   key_name                    = var.ec2_keyname
   subnet_id                   = module.vpc.public_subnets[0]
@@ -250,10 +250,16 @@ EOF
       "echo '${aws_efs_file_system.solr_backups.id}:/ /srv/solr_backups efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab",
       "sudo mkdir -p /srv/solr_backups && sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${aws_efs_file_system.solr_backups.dns_name}:/ /srv/solr_backups",
       "sudo chown 8983:8983 /srv/solr_backups",
-      "sudo service docker restart",
+      "sudo yum install -y docker && sudo usermod -a -G docker ec2-user && sudo systemctl enable --now docker",
+      "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose",
+      "sudo chmod +x /usr/local/bin/docker-compose",
       "wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip && unzip aws_min.zip",
-      "cd avalon-docker-aws_min && cp /tmp/.env . && docker-compose pull && docker-compose up -d",
+      "cd avalon-docker-aws_min && cp /tmp/.env .",
     ]
+  }
+
+  provisioner "local-exec" {
+    command = "aws codebuild start-build --project-name ${aws_codebuild_project.docker.name} --profile ${var.aws_profile}"
   }
 }
 
