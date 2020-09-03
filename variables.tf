@@ -15,6 +15,10 @@ variable "availability_zone" {
   default = "us-east-1a"
 }
 
+variable "avalon_admin" {
+  default = "admin@example.com"
+}
+
 variable "avalon_repo" {
   default = "https://github.com/avalonmediasystem/avalon"
 }

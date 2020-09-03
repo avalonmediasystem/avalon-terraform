@@ -231,6 +231,7 @@ SETTINGS__EMAIL__SUPPORT=${var.email_support}
 STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
 SETTINGS__STREAMING__HTTP_BASE=https://${aws_route53_record.alb_streaming.fqdn}/avalon
 SETTINGS__TIMELINER__TIMELINER_URL=https://${aws_route53_record.alb.fqdn}/timeliner
+SETTINGS__INITIAL_USER=${var.avalon_admin}
 EOF
 
     destination = "/tmp/.env"
