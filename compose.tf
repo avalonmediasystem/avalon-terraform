@@ -259,7 +259,7 @@ EOF
   }
 
   provisioner "local-exec" {
-    command = "aws codebuild start-build --project-name ${aws_codebuild_project.docker.name} --profile ${var.aws_profile}"
+    command = "aws codebuild start-build --project-name ${aws_codebuild_project.docker.name} --profile ${var.aws_profile} --region ${var.aws_region}"
   }
 }
 
