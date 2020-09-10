@@ -86,7 +86,7 @@ POLICY
 }
 
 resource "aws_ecr_repository" "avalon" {
-  name                 = "avalon"
+  name                 = "avalon-${var.environment}"
   image_tag_mutability = "MUTABLE"
 
   tags = local.common_tags
