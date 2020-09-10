@@ -179,7 +179,7 @@ resource "aws_route53_record" "web_cert_validation" {
   name    = tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_name
   type    = tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_type
   zone_id = module.dns.public_zone_id
-  records = tolist([aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_value]
+  records = [tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_value]
   ttl     = 60
 }
 
@@ -204,7 +204,7 @@ resource "aws_route53_record" "streaming_cert_validation" {
   name    = tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_name
   type    = tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_type
   zone_id = module.dns.public_zone_id
-  records = tolist([aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_value]
+  records = [tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_value]
   ttl     = 60
 }
 
