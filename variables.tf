@@ -71,6 +71,12 @@ variable "environment" {
   type = string
 }
 
+variable "fedora_ssl" {
+  type = bool
+  default = false
+  description = "Forces the fedora database connection to use ssl."
+}
+
 variable "fcrepo_binary_bucket_username" {
   type = string
 }
