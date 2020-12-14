@@ -203,7 +203,7 @@ FEDORA_OPTIONS=-Dfcrepo.modeshape.configuration=classpath:/config/jdbc-postgresq
 FEDORA_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/fedora.log
 
 SOLR_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/solr.log
-
+S3_HELPER_LOGROUP==${aws_cloudwatch_log_group.compose_log_group.name}/s3-helper.log
 HLS_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/hls.log
 AVALON_STREAMING_BUCKET=${aws_s3_bucket.this_derivatives.id}
 
