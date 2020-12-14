@@ -168,7 +168,7 @@ resource "aws_instance" "compose" {
   )
 
   root_block_device {
-    volume_size = "50"
+    volume_size = var.compose_volume_size
     volume_type = "standard"
   }
 
