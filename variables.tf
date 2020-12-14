@@ -39,6 +39,12 @@ variable "compose_instance_type" {
   default = "t3.large"
 }
 
+variable "compose_volume_size" {
+  type = number
+  default = 75
+  description = "The root volume size, in gigabytes, of the ec2 that runs the avalon docker containers"
+}
+
 variable "db_avalon_username" {
   default = "dbavalon"
 }
