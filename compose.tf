@@ -199,11 +199,11 @@ resource "null_resource" "install_docker_on_compose" {
     }
 
     content = <<EOF
-FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${module.db_fcrepo.this_db_instance_address} -Dfcrepo.postgresql.username=${module.db_fcrepo.this_db_instance_username} -Dfcrepo.postgresql.password=${module.db_fcrepo.this_db_instance_password} -Dfcrepo.postgresql.port=${module.db_fcrepo.this_db_instance_port} -Daws.accessKeyId=${var.fcrepo_binary_bucket_access_key} -Daws.secretKey=${var.fcrepo_binary_bucket_secret_key} -Daws.bucket=${aws_s3_bucket.fcrepo_binary_bucket.id}
+FEDORA_OPTIONS=-Dfcrepo.modeshape.configuration=classpath:/config/jdbc-postgresql-s3/repository${var.fcrepo_db_ssl ? "-ssl" : ""}.json -Dfcrepo.postgresql.host=${module.db_fcrepo.this_db_instance_address} -Dfcrepo.postgresql.username=${module.db_fcrepo.this_db_instance_username} -Dfcrepo.postgresql.password=${module.db_fcrepo.this_db_instance_password} -Dfcrepo.postgresql.port=${module.db_fcrepo.this_db_instance_port} -Daws.accessKeyId=${var.fcrepo_binary_bucket_access_key} -Daws.secretKey=${var.fcrepo_binary_bucket_secret_key} -Daws.bucket=${aws_s3_bucket.fcrepo_binary_bucket.id}
 FEDORA_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/fedora.log
 
 SOLR_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/solr.log
-
+S3_HELPER_LOGROUP==${aws_cloudwatch_log_group.compose_log_group.name}/s3-helper.log
 HLS_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/hls.log
 AVALON_STREAMING_BUCKET=${aws_s3_bucket.this_derivatives.id}
 

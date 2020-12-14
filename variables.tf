@@ -89,6 +89,12 @@ variable "fcrepo_binary_bucket_secret_key" {
   type = string
 }
 
+variable "fcrepo_db_ssl" {
+  type = bool
+  default = false
+  description = "Forces SSL on the fedora database connection"
+}
+
 variable "hosted_zone_name" {
   type = string
 }
