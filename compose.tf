@@ -217,7 +217,7 @@ DATABASE_URL=postgres://${module.db_avalon.this_db_instance_username}:${module.d
 ELASTICACHE_HOST=${aws_route53_record.redis.name}
 SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b16f44aa54a98008d62f6874360284d00bb29dc08c166197d043406b42190188a
 AVALON_BRANCH=master
-AWS_REGION=us-east-1
+AWS_REGION=${var.aws_region}
 RAILS_LOG_TO_STDOUT=true
 SETTINGS__DOMAIN=https://${aws_route53_record.alb.fqdn}
 SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
@@ -233,6 +233,19 @@ STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
 SETTINGS__STREAMING__HTTP_BASE=https://${aws_route53_record.alb_streaming.fqdn}/avalon
 SETTINGS__TIMELINER__TIMELINER_URL=https://${aws_route53_record.alb.fqdn}/timeliner
 SETTINGS__INITIAL_USER=${var.avalon_admin}
+
+SETTINGS__BIB_RETRIEVER__DEFAULT__PROTOCOL=${var.bib_retriever_protocol}
+SETTINGS__BIB_RETRIEVER__DEFAULT__HOST=${var.bib_retriever_host}
+SETTINGS__BIB_RETRIEVER__DEFAULT__PORT=${var.bib_retriever_port}
+SETTINGS__BIB_RETRIEVER__DEFAULT__DATABASE=${var.bib_retriever_database}
+SETTINGS__BIB_RETRIEVER__DEFAULT__ATTRIBUTE=${var.bib_retriever_attribute}
+SETTINGS__BIB_RETRIEVER__DEFAULT__RETRIEVER_CLASS=${var.bib_retriever_class}
+SETTINGS__BIB_RETRIEVER__DEFAULT__RETRIEVER_CLASS_REQUIRE=${var.bib_retriever_class_require}
+
+SETTINGS__ACTIVE_STORAGE__SERVICE=amazon
+SETTINGS__ACTIVE_STORAGE__BUCKET=${var.this_supplemental_files}
+
+CDN_HOST=https://${aws_route53_record.alb.fqdn}
 EOF
 
     destination = "/tmp/.env"
