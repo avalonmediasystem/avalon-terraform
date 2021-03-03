@@ -204,7 +204,7 @@ FEDORA_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/fedora.log
 FEDORA_MODESHAPE_CONFIG=classpath:/config/jdbc-postgresql-s3/repository${var.fcrepo_db_ssl ? "-ssl" : ""}.json
 
 SOLR_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/solr.log
-S3_HELPER_LOGROUP==${aws_cloudwatch_log_group.compose_log_group.name}/s3-helper.log
+S3_HELPER_LOGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/s3-helper.log
 HLS_LOGGROUP=${aws_cloudwatch_log_group.compose_log_group.name}/hls.log
 AVALON_STREAMING_BUCKET=${aws_s3_bucket.this_derivatives.id}
 
@@ -243,7 +243,7 @@ SETTINGS__BIB_RETRIEVER__DEFAULT__RETRIEVER_CLASS=${var.bib_retriever_class}
 SETTINGS__BIB_RETRIEVER__DEFAULT__RETRIEVER_CLASS_REQUIRE=${var.bib_retriever_class_require}
 
 SETTINGS__ACTIVE_STORAGE__SERVICE=amazon
-SETTINGS__ACTIVE_STORAGE__BUCKET=${var.this_supplemental_files}
+SETTINGS__ACTIVE_STORAGE__BUCKET=${aws_s3_bucket.this_supplemental_files.id}
 
 CDN_HOST=https://${aws_route53_record.alb.fqdn}
 EOF
