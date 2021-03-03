@@ -31,6 +31,34 @@ variable "avalon_branch" {
   default = "demo"
 }
 
+variable "bib_retriever_protocol" {
+  default = "z39.50"
+}
+
+variable "bib_retriever_host" {
+  default = ""
+}
+
+variable "bib_retriever_port" {
+  default = "210"
+}
+
+variable "bib_retriever_database" {
+  default = "INNOPAC"
+}
+
+variable "bib_retriever_attribute" {
+  default = "12"
+}
+
+variable "bib_retriever_class" {
+  default = "Avalon::BibRetriever::Zoom"
+}
+
+variable "bib_retriever_class_require" {
+  default = "avalon/bib_retriever/zoom"
+}
+
 variable "bastion_instance_type" {
   default = "t2.micro"
 }

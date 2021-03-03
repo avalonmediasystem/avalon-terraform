@@ -1,6 +1,6 @@
 provider "aws" {
   profile = var.aws_profile
-  region = var.aws_region
+  region  = var.aws_region
 }
 
 terraform {
@@ -8,7 +8,16 @@ terraform {
   }
 
   required_providers {
-    aws = "~> 3.0"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+    http = {
+      source = "hashicorp/http"
+    }
+    null = {
+      source = "hashicorp/null"
+    }
   }
 }
 
