@@ -40,26 +40,26 @@ resource "aws_security_group_rule" "alb_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-# Domain names for web and streaming endpoints
-resource "aws_route53_record" "alb" {
-  zone_id = module.dns.public_zone_id
-  name    = local.public_zone_name
-  type    = "A"
+# # Domain names for web and streaming endpoints
+# resource "aws_route53_record" "alb" {
+#   zone_id = module.dns.public_zone_id
+#   name    = local.public_zone_name
+#   type    = "A"
 
-  alias {
-    name                   = aws_alb.alb.dns_name
-    zone_id                = aws_alb.alb.zone_id
-    evaluate_target_health = false
-  }
-}
+#   alias {
+#     name                   = aws_alb.alb.dns_name
+#     zone_id                = aws_alb.alb.zone_id
+#     evaluate_target_health = false
+#   }
+# }
 
-resource "aws_route53_record" "alb_streaming" {
-  zone_id = module.dns.public_zone_id
-  name    = "streaming.${local.public_zone_name}"
-  type    = "CNAME"
-  ttl     = "300"
-  records = [aws_alb.alb.dns_name]
-}
+# resource "aws_route53_record" "alb_streaming" {
+#   zone_id = module.dns.public_zone_id
+#   name    = "streaming.${local.public_zone_name}"
+#   type    = "CNAME"
+#   ttl     = "300"
+#   records = [aws_alb.alb.dns_name]
+# }
 
 resource "aws_lb_listener" "alb_forward_https" {
   load_balancer_arn = aws_alb.alb.arn
@@ -81,7 +81,7 @@ resource "aws_alb_listener" "alb_listener" {
   load_balancer_arn = aws_alb.alb.arn
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate_validation.web_cert.certificate_arn
+  certificate_arn   = aws_acm_certificate.web_cert.arn
 
   default_action {
     target_group_arn = aws_alb_target_group.alb_web.arn
@@ -101,7 +101,7 @@ resource "aws_lb_listener_rule" "alb_web_listener_rule" {
 
   condition {
     host_header {
-      values = [aws_route53_record.alb.fqdn]
+      values = [local.web_fqdn]
     }
   }
 }
@@ -139,7 +139,7 @@ resource "aws_lb_listener_rule" "alb_streaming_listener_rule" {
 
   condition {
       host_header {
-        values = [aws_route53_record.alb_streaming.fqdn]
+        values = [local.streaming_fqdn]
     }
   }
 }
@@ -167,7 +167,7 @@ resource "aws_alb_target_group" "alb_streaming" {
 
 # Create and validate web certificate 
 resource "aws_acm_certificate" "web_cert" {
-  domain_name       = aws_route53_record.alb.fqdn
+  domain_name       = local.web_fqdn
   validation_method = "DNS"
 
   tags = local.common_tags
@@ -177,22 +177,22 @@ resource "aws_acm_certificate" "web_cert" {
   }
 }
 
-resource "aws_route53_record" "web_cert_validation" {
-  name    = tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_name
-  type    = tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_type
-  zone_id = module.dns.public_zone_id
-  records = [tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_value]
-  ttl     = 60
-}
+# resource "aws_route53_record" "web_cert_validation" {
+#   name    = tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_name
+#   type    = tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_type
+#   zone_id = module.dns.public_zone_id
+#   records = [tolist(aws_acm_certificate.web_cert.domain_validation_options)[0].resource_record_value]
+#   ttl     = 60
+# }
 
-resource "aws_acm_certificate_validation" "web_cert" {
-  certificate_arn         = aws_acm_certificate.web_cert.arn
-  validation_record_fqdns = [aws_route53_record.web_cert_validation.fqdn]
-}
+# resource "aws_acm_certificate_validation" "web_cert" {
+#   certificate_arn         = aws_acm_certificate.web_cert.arn
+#   validation_record_fqdns = [aws_route53_record.web_cert_validation.fqdn]
+# }
 
 # Create, validate and attach streaming certificate 
 resource "aws_acm_certificate" "streaming_cert" {
-  domain_name       = aws_route53_record.alb_streaming.fqdn
+  domain_name       = local.streaming_fqdn
   validation_method = "DNS"
 
   tags = local.common_tags
@@ -202,22 +202,22 @@ resource "aws_acm_certificate" "streaming_cert" {
   }
 }
 
-resource "aws_route53_record" "streaming_cert_validation" {
-  name    = tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_name
-  type    = tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_type
-  zone_id = module.dns.public_zone_id
-  records = [tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_value]
-  ttl     = 60
-}
+# resource "aws_route53_record" "streaming_cert_validation" {
+#   name    = tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_name
+#   type    = tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_type
+#   zone_id = module.dns.public_zone_id
+#   records = [tolist(aws_acm_certificate.streaming_cert.domain_validation_options)[0].resource_record_value]
+#   ttl     = 60
+# }
 
-resource "aws_acm_certificate_validation" "streaming_cert" {
-  certificate_arn         = aws_acm_certificate.streaming_cert.arn
-  validation_record_fqdns = [aws_route53_record.streaming_cert_validation.fqdn]
-}
+# resource "aws_acm_certificate_validation" "streaming_cert" {
+#   certificate_arn         = aws_acm_certificate.streaming_cert.arn
+#   validation_record_fqdns = [aws_route53_record.streaming_cert_validation.fqdn]
+# }
 
 resource "aws_lb_listener_certificate" "alb_streaming" {
   listener_arn    = aws_alb_listener.alb_listener.arn
-  certificate_arn = aws_acm_certificate_validation.streaming_cert.certificate_arn
+  certificate_arn = aws_acm_certificate.streaming_cert.arn
 }
 
 #Instance Attachment
@@ -233,3 +233,7 @@ resource "aws_alb_target_group_attachment" "alb_compose_streaming" {
   port             = 8880
 }
 
+locals {
+  web_fqdn = var.avalon_fqdn
+  streaming_fqdn = "streaming.${var.avalon_fqdn}"
+}

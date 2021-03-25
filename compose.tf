@@ -219,7 +219,7 @@ SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b
 AVALON_BRANCH=master
 AWS_REGION=${var.aws_region}
 RAILS_LOG_TO_STDOUT=true
-SETTINGS__DOMAIN=https://${aws_route53_record.alb.fqdn}
+SETTINGS__DOMAIN=https://${local.web_fqdn}
 SETTINGS__DROPBOX__PATH=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
 SETTINGS__DROPBOX__UPLOAD_URI=s3://${aws_s3_bucket.this_masterfiles.id}/dropbox/
 SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${aws_s3_bucket.this_preservation.id}/
@@ -229,9 +229,9 @@ SETTINGS__ENCODING__PIPELINE=${aws_elastictranscoder_pipeline.this_pipeline.id}
 SETTINGS__EMAIL__COMMENTS=${var.email_comments}
 SETTINGS__EMAIL__NOTIFICATION=${var.email_notification}
 SETTINGS__EMAIL__SUPPORT=${var.email_support}
-STREAMING_HOST=${aws_route53_record.alb_streaming.fqdn}
-SETTINGS__STREAMING__HTTP_BASE=https://${aws_route53_record.alb_streaming.fqdn}/avalon
-SETTINGS__TIMELINER__TIMELINER_URL=https://${aws_route53_record.alb.fqdn}/timeliner
+STREAMING_HOST=${local.streaming_fqdn}
+SETTINGS__STREAMING__HTTP_BASE=https://${local.streaming_fqdn}/avalon
+SETTINGS__TIMELINER__TIMELINER_URL=https://${local.web_fqdn}/timeliner
 SETTINGS__INITIAL_USER=${var.avalon_admin}
 
 SETTINGS__BIB_RETRIEVER__DEFAULT__PROTOCOL=${var.bib_retriever_protocol}
@@ -245,7 +245,7 @@ SETTINGS__BIB_RETRIEVER__DEFAULT__RETRIEVER_CLASS_REQUIRE=${var.bib_retriever_cl
 SETTINGS__ACTIVE_STORAGE__SERVICE=amazon
 SETTINGS__ACTIVE_STORAGE__BUCKET=${aws_s3_bucket.this_supplemental_files.id}
 
-CDN_HOST=https://${aws_route53_record.alb.fqdn}
+CDN_HOST=https://${local.web_fqdn}
 EOF
 
     destination = "/tmp/.env"

@@ -31,6 +31,10 @@ variable "avalon_branch" {
   default = "demo"
 }
 
+variable "avalon_fqdn" {
+  default = ""
+}
+
 variable "bib_retriever_protocol" {
   default = "z39.50"
 }
@@ -128,7 +132,7 @@ variable "hosted_zone_name" {
 }
 
 variable "postgres_version" {
-  default = "10.6"
+  default = "10.15"
 }
 
 variable "sms_notification" {
