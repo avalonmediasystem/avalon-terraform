@@ -67,7 +67,7 @@ In order for Avalon to send mails using AWS, you need to add these variables to 
 
 ### Authentication
 
-Turnkey comes bundled with [Persona](https://github.com/samvera-labs/samvera-persona) by default but can be configured to work with other authentication strategies by using the appropriate omniauth gems. Refer to [this doc](https://wiki.dlib.indiana.edu/display/VarVideo/Manual+Installation+Instructions#ManualInstallationInstructions-AuthenticationStrategy) for integration instruction.
+Turnkey comes bundled with [Persona](https://github.com/samvera-labs/samvera-persona) by default but can be configured to work with other authentication strategies by using the appropriate omniauth gems. Refer to [this doc](https://samvera.atlassian.net/wiki/spaces/AVALON/pages/1957954771/Manual+Installation+Instructions#ManualInstallationInstructions-AuthenticationStrategy) for integration instruction.
 
 # Maintenance
 
