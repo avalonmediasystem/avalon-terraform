@@ -19,7 +19,7 @@ module "db_fcrepo" {
   password = module.db_fcrepo_password.result
   port     = 5432
 
-  option_group_name       = "default:postgres-10"
+  option_group_name       = "default:postgres-14"
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_window           = "03:00-06:00"
   backup_retention_period = 35
@@ -30,16 +30,9 @@ module "db_fcrepo" {
   availability_zone = aws_instance.compose.availability_zone
 
   tags = local.common_tags
-  family = "postgres10"
+  family = "postgres14"
 
   apply_immediately = true
-
-  parameters = [
-    {
-      name  = "client_encoding"
-      value = "UTF8"
-    },
-  ]
 }
 
 resource "aws_ssm_parameter" "db_fcrepo_host" {
