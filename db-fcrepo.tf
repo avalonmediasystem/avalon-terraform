@@ -27,7 +27,7 @@ module "db_fcrepo" {
 
   vpc_security_group_ids = [aws_security_group.db.id]
   subnet_ids = module.vpc.private_subnets
-  availability_zone = aws_instance.compose.availability_zone
+  availability_zone = var.availability_zone
 
   tags = local.common_tags
   family = "postgres14"

@@ -128,12 +128,12 @@ variable "hosted_zone_name" {
 }
 
 variable "postgres_version" {
-  default = "10.6"
+  default = "14.4"
 }
 
-variable "sms_notification" {
-  type = string
-}
+#variable "sms_notification" {
+#  type = string
+#}
 
 variable "stack_name" {
   default = "stack"
@@ -156,10 +156,6 @@ variable "stack_region" {
 variable "tags" {
   type    = map(string)
   default = {}
-}
-
-variable "ssh_cidr_block" {
-  type = string
 }
 
 variable "vpc_cidr_block" {

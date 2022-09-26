@@ -95,6 +95,7 @@ output "db_avalon_username" {
 }
 
 output "db_avalon_password" {
+  sensitive = true
   value = module.db_avalon.this_db_instance_password
 }
 
@@ -111,6 +112,7 @@ output "db_fcrepo_username" {
 }
 
 output "db_fcrepo_password" {
+  sensitive = true
   value = module.db_fcrepo.this_db_instance_password
 }
 
