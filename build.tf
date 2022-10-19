@@ -105,7 +105,7 @@ resource "aws_codebuild_project" "docker" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_MEDIUM"
-    image                       = "aws/codebuild/standard:2.0"
+    image                       = "aws/codebuild/standard:6.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
@@ -144,7 +144,7 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AVALON_DOCKER_REPO
       - AVALON_REV=`git ls-remote $AVALON_REPO refs/heads/$AVALON_BRANCH | cut -f 1`
       - AVALON_DOCKER_CACHE_TAG=$AVALON_REV
       - docker pull $AVALON_DOCKER_REPO:$AVALON_DOCKER_CACHE_TAG || docker pull $AVALON_DOCKER_REPO:latest || true
