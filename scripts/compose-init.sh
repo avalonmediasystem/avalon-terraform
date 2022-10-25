@@ -11,8 +11,8 @@ sudo chown -R 8983:8983 /srv/solr_data
 sudo echo /dev/xvdh  /srv/solr_data ext4 defaults,nofail 0 2 >> /etc/fstab
 
 # Setup
-echo '${solr_backups_efs_id}:/ /srv/solr_backups efs defaults,_netdev 0 0' | sudo tee -a /etc/fstab
-sudo mkdir -p /srv/solr_backups && sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${solr_backups_efs_dns_name}:/ /srv/solr_backups
+echo '${solr_backups_efs_id}:/ /srv/solr_backups nfs nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0' | sudo tee -a /etc/fstab
+sudo mkdir -p /srv/solr_backups && sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev ${solr_backups_efs_dns_name}:/ /srv/solr_backups
 sudo chown 8983:8983 /srv/solr_backups
 sudo yum install -y docker && sudo usermod -a -G docker ec2-user && sudo systemctl enable --now docker
 sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
