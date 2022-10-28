@@ -200,6 +200,8 @@ resource "aws_instance" "compose" {
     email_support = "${var.email_support}"
     avalon_admin = "${var.avalon_admin}"
     bib_retriever_protocol = "${var.bib_retriever_protocol}"
+    bib_retriever_url = "${var.bib_retriever_url}"
+    bib_retriever_query = "${var.bib_retriever_query}"
     bib_retriever_host = "${var.bib_retriever_host}"
     bib_retriever_port = "${var.bib_retriever_port}"
     bib_retriever_database = "${var.bib_retriever_database}"

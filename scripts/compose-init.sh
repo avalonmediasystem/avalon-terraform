@@ -57,6 +57,8 @@ SETTINGS__TIMELINER__TIMELINER_URL=https://${avalon_fqdn}/timeliner
 SETTINGS__INITIAL_USER=${avalon_admin}
 
 SETTINGS__BIB_RETRIEVER__DEFAULT__PROTOCOL=${bib_retriever_protocol}
+SETTINGS__BIB_RETRIEVER__DEFAULT__URL=${bib_retriever_url}
+SETTINGS__BIB_RETRIEVER__DEFAULT__QUERY=${bib_retriever_query}
 SETTINGS__BIB_RETRIEVER__DEFAULT__HOST=${bib_retriever_host}
 SETTINGS__BIB_RETRIEVER__DEFAULT__PORT=${bib_retriever_port}
 SETTINGS__BIB_RETRIEVER__DEFAULT__DATABASE=${bib_retriever_database}

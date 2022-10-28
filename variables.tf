@@ -32,7 +32,15 @@ variable "avalon_branch" {
 }
 
 variable "bib_retriever_protocol" {
-  default = "z39.50"
+  default = "sru"
+}
+
+variable "bib_retriever_url" {
+  default = "http://zgate.example.edu:9000/exampledb"
+}
+
+variable "bib_retriever_query" {
+  default = "rec.id='%s'"
 }
 
 variable "bib_retriever_host" {
@@ -40,23 +48,23 @@ variable "bib_retriever_host" {
 }
 
 variable "bib_retriever_port" {
-  default = "210"
+  default = ""
 }
 
 variable "bib_retriever_database" {
-  default = "INNOPAC"
+  default = ""
 }
 
 variable "bib_retriever_attribute" {
-  default = "12"
+  default = ""
 }
 
 variable "bib_retriever_class" {
-  default = "Avalon::BibRetriever::Zoom"
+  default = "Avalon::BibRetriever::SRU"
 }
 
 variable "bib_retriever_class_require" {
-  default = "avalon/bib_retriever/zoom"
+  default = "avalon/bib_retriever/sru"
 }
 
 variable "bastion_instance_type" {
