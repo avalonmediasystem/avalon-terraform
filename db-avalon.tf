@@ -9,6 +9,8 @@ module "db_avalon" {
 
   engine         = "postgres"
   engine_version = var.postgres_version
+  family = "postgres14"
+  major_engine_version = "14"
 
   instance_class    = "db.t3.micro"
   allocated_storage = 20
@@ -25,10 +27,11 @@ module "db_avalon" {
   copy_tags_to_snapshot   = true
 
   vpc_security_group_ids = [aws_security_group.db.id]
+  create_db_subnet_group = true
   subnet_ids = module.vpc.private_subnets
+  availability_zone = var.availability_zone
 
   tags = local.common_tags
-  family = "postgres14"
 
   apply_immediately = true
 }
