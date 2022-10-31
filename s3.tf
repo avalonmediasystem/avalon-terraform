@@ -15,6 +15,7 @@ resource "aws_s3_bucket_cors_configuration" "this_masterfiles" {
   cors_rule {
     allowed_origins = ["*"]
     allowed_methods = ["GET", "PUT", "POST"]
+    allowed_headers = ["x-csrf-token"]
   }
 }
 
