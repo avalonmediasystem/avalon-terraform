@@ -1,6 +1,5 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.78.0"
 
   name = "${local.namespace}-vpc"
 
@@ -15,12 +14,23 @@ module "vpc" {
   single_nat_gateway           = true
   create_database_subnet_group = false
 
-  enable_ec2_endpoint = true
+  tags = local.common_tags
+}
 
-  # enable_s3_endpoint                = true
-  enable_ssm_endpoint             = true
-  ec2_endpoint_security_group_ids = [module.vpc.default_security_group_id]
-  ssm_endpoint_security_group_ids = [module.vpc.default_security_group_id]
+module "endpoints" {
+  source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+
+  vpc_id             = module.vpc.vpc_id
+  security_group_ids = [module.vpc.default_security_group_id]
+
+  endpoints = {
+    ssm = {
+      service         = "ssm"
+    },
+    ec2 = {
+      service         = "ec2"
+    },
+  }
 
   tags = local.common_tags
 }
