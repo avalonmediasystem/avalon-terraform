@@ -4,7 +4,6 @@ module "db_avalon_password" {
 
 module "db_avalon" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "2.9.0"
 
   identifier = "${local.namespace}-avalon-db"
 
@@ -14,7 +13,7 @@ module "db_avalon" {
   instance_class    = "db.t3.micro"
   allocated_storage = 20
 
-  name     = "avalon"
+  db_name  = "avalon"
   username = var.db_avalon_username
   password = module.db_avalon_password.result
   port     = 5432
@@ -36,28 +35,28 @@ module "db_avalon" {
 
 resource "aws_ssm_parameter" "db_avalon_host" {
   name      = "/${local.namespace}-avalon-db/host"
-  value     = module.db_avalon.this_db_instance_address
+  value     = module.db_avalon.db_instance_address
   type      = "String"
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_port" {
   name      = "/${local.namespace}-avalon-db/port"
-  value     = module.db_avalon.this_db_instance_port
+  value     = module.db_avalon.db_instance_port
   type      = "String"
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_admin_user" {
   name      = "/${local.namespace}-avalon-db/admin_user"
-  value     = module.db_avalon.this_db_instance_username
+  value     = module.db_avalon.db_instance_username
   type      = "SecureString"
   overwrite = true
 }
 
 resource "aws_ssm_parameter" "db_avalon_admin_password" {
   name      = "/${local.namespace}-avalon-db/admin_password"
-  value     = module.db_avalon.this_db_instance_password
+  value     = module.db_avalon.db_instance_password
   type      = "SecureString"
   overwrite = true
 }

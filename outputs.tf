@@ -83,37 +83,39 @@ output "cache_port" {
 # }
 
 output "db_avalon_address" {
-  value = module.db_avalon.this_db_instance_address
+  value = module.db_avalon.db_instance_address
 }
 
 output "db_avalon_port" {
-  value = module.db_avalon.this_db_instance_port
+  value = module.db_avalon.db_instance_port
 }
 
 output "db_avalon_username" {
-  value = module.db_avalon.this_db_instance_username
+  sensitive = true
+  value = module.db_avalon.db_instance_username
 }
 
 output "db_avalon_password" {
   sensitive = true
-  value = module.db_avalon.this_db_instance_password
+  value = module.db_avalon.db_instance_password
 }
 
 output "db_fcrepo_address" {
-  value = module.db_fcrepo.this_db_instance_address
+  value = module.db_fcrepo.db_instance_address
 }
 
 output "db_fcrepo_port" {
-  value = module.db_fcrepo.this_db_instance_port
+  value = module.db_fcrepo.db_instance_port
 }
 
 output "db_fcrepo_username" {
-  value = module.db_fcrepo.this_db_instance_username
+  sensitive = true
+  value = module.db_fcrepo.db_instance_username
 }
 
 output "db_fcrepo_password" {
   sensitive = true
-  value = module.db_fcrepo.this_db_instance_password
+  value = module.db_fcrepo.db_instance_password
 }
 
 output "private_subnets" {
