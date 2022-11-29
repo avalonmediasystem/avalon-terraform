@@ -1,20 +1,37 @@
 resource "aws_s3_bucket" "this_masterfiles" {
   bucket        = "${local.namespace}-masterfiles"
-  acl           = "private"
   tags          = local.common_tags
   force_destroy = "false"
+}
+
+resource "aws_s3_bucket_acl" "this_masterfiles_bucket_acl" {
+  bucket = aws_s3_bucket.this_masterfiles.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_cors_configuration" "this_masterfiles" {
+  bucket = aws_s3_bucket.this_masterfiles.id
 
   cors_rule {
     allowed_origins = ["*"]
     allowed_methods = ["GET", "PUT", "POST"]
+    allowed_headers = ["x-csrf-token"]
   }
 }
 
 resource "aws_s3_bucket" "this_derivatives" {
   bucket        = "${local.namespace}-derivatives"
-  acl           = "private"
   tags          = local.common_tags
   force_destroy = "false"
+}
+
+resource "aws_s3_bucket_acl" "this_derivatives_bucket_acl" {
+  bucket = aws_s3_bucket.this_derivatives.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_cors_configuration" "this_derivatives" {
+  bucket = aws_s3_bucket.this_derivatives.id
 
   cors_rule {
     allowed_origins = ["*"]
@@ -26,17 +43,24 @@ resource "aws_s3_bucket" "this_derivatives" {
 
 resource "aws_s3_bucket" "this_preservation" {
   bucket        = "${local.namespace}-preservation"
-  acl           = "private"
   tags          = local.common_tags
   force_destroy = "false"
 }
 
+resource "aws_s3_bucket_acl" "this_preservation_bucket_acl" {
+  bucket = aws_s3_bucket.this_preservation.id
+  acl    = "private"
+}
 
 resource "aws_s3_bucket" "this_supplemental_files" {
   bucket        = "${local.namespace}-supplemental-files"
-  acl           = "private"
   tags          = local.common_tags
   force_destroy = "false"
+}
+
+resource "aws_s3_bucket_acl" "this_supplemental_files_bucket_acl" {
+  bucket = aws_s3_bucket.this_supplemental_files.id
+  acl    = "private"
 }
 
 data "aws_iam_policy_document" "this_bucket_access" {
@@ -93,9 +117,13 @@ data "aws_iam_policy_document" "this_bucket_access" {
 
 resource "aws_s3_bucket" "fcrepo_binary_bucket" {
   bucket        = "${local.namespace}-fedora-binaries"
-  acl           = "private"
   tags          = local.common_tags
   force_destroy = "true"
+}
+
+resource "aws_s3_bucket_acl" "fcrepo_binary_bucket_acl" {
+  bucket = aws_s3_bucket.fcrepo_binary_bucket.id
+  acl    = "private"
 }
 
 data "aws_iam_policy_document" "fcrepo_binary_bucket_access" {
