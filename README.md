@@ -29,7 +29,6 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
     environment         = "dev"
     hosted_zone_name    = "mydomain.org"
     ec2_keyname         = "my-ec2-key"
-    ec2_private_keyfile = "/local/path/my-ec2-key.pem"
     stack_name          = "mystack"
     fcrepo_binary_bucket_username   = "iam_user"
     fcrepo_binary_bucket_access_key = "***********"

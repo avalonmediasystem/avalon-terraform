@@ -93,10 +93,6 @@ variable "ec2_keyname" {
   type = string
 }
 
-variable "ec2_private_keyfile" {
-  type = string
-}
-
 variable "email_comments" {
   type = string
 }
