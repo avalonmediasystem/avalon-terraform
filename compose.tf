@@ -128,7 +128,7 @@ resource "aws_security_group_rule" "compose_ssh" {
   from_port         = "22"
   to_port           = "22"
   protocol          = "tcp"
-  cidr_blocks       = [var.vpc_cidr_block]
+  cidr_blocks       = setunion([var.vpc_cidr_block], var.ssh_cidr_blocks)
 }
 
 resource "aws_security_group_rule" "compose_egress" {

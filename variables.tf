@@ -143,6 +143,12 @@ variable "postgres_version" {
 #  type = string
 #}
 
+variable "ssh_cidr_blocks" {
+  description = "Allow inbound SSH connections from given CIDR ranges"
+  type    = list(string)
+  default = []
+}
+
 variable "stack_name" {
   default = "stack"
 }
