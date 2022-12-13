@@ -12,10 +12,6 @@ output "ec2_keyname" {
   value = var.ec2_keyname
 }
 
-output "ec2_private_keyfile" {
-  value = var.ec2_private_keyfile
-}
-
 output "environment" {
   value = var.environment
 }
