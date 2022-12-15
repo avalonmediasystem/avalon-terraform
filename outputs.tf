@@ -126,6 +126,10 @@ output "private_zone_id" {
   value = module.dns.private_zone_id
 }
 
+output "public_zone_name" {
+  value = local.public_zone_name
+}
+
 output "public_subnets" {
   value = module.vpc.public_subnets
 }
