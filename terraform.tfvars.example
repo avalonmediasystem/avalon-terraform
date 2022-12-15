@@ -3,13 +3,11 @@ hosted_zone_name    = "mydomain.org"
 ec2_keyname         = "my-ec2-key"
 ec2_private_keyfile = "/local/path/my-ec2-key.pem"
 stack_name          = "mystack"
-stack_bucket        = "mystack-state"
-sms_notification    = "+18125550123"
 ssh_cidr_blocks     = []
 fcrepo_binary_bucket_username   = "iam_user"
 fcrepo_binary_bucket_access_key = "***********"
 fcrepo_binary_bucket_secret_key = "***********"
-tags {
+tags = {
   Creator    = "Username"
   For        = "Avalon Turnkey"
 }

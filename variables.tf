@@ -153,20 +153,6 @@ variable "stack_name" {
   default = "stack"
 }
 
-variable "stack_bucket" {
-  type = string
-}
-
-variable "stack_key" {
-  type    = string
-  default = "stack.tfstate"
-}
-
-variable "stack_region" {
-  type    = string
-  default = "us-east-1"
-}
-
 variable "tags" {
   type    = map(string)
   default = {}
