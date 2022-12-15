@@ -172,10 +172,16 @@ variable "vpc_private_subnets" {
   default = ["10.1.1.0/24", "10.1.3.0/24", "10.1.5.0/24"]
 }
 
+variable "zone_prefix" {
+  description = "An optional prefix string to the hosted zone names"
+  type = string
+  default = ""
+}
+
 locals {
   namespace         = "${var.stack_name}-${var.environment}"
-  public_zone_name  = "${var.environment}.${var.hosted_zone_name}"
-  private_zone_name = "vpc.${var.environment}.${var.hosted_zone_name}"
+  public_zone_name  = "${var.zone_prefix}${var.environment}.${var.hosted_zone_name}"
+  private_zone_name = "vpc.${var.zone_prefix}${var.environment}.${var.hosted_zone_name}"
 
   common_tags = merge(
     var.tags,
