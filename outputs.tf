@@ -126,6 +126,10 @@ output "private_zone_id" {
   value = module.dns.private_zone_id
 }
 
+output "public_ip" {
+  value = aws_instance.compose.public_ip
+}
+
 output "public_zone_name" {
   value = local.public_zone_name
 }

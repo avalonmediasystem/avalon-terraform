@@ -149,6 +149,24 @@ resource "aws_security_group_rule" "allow_this_redis_access" {
   source_security_group_id = aws_security_group.compose.id
 }
 
+resource "aws_security_group" "public_ip" {
+  name        = "${local.namespace}-ssh-public-ip"
+  description = "SSH Public IP Security Group"
+  tags        = local.common_tags
+  vpc_id      = module.vpc.vpc_id
+}
+
+resource "aws_security_group_rule" "ssh_public_ip" {
+  type = "ingress"
+  description = "Allow SSH direct to public IP"
+  cidr_blocks = var.ssh_cidr_blocks
+  ipv6_cidr_blocks = []
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  security_group_id = aws_security_group.public_ip.id
+}
+
 resource "aws_instance" "compose" {
   ami                         = data.aws_ami.amzn.id
   instance_type               = var.compose_instance_type
@@ -214,6 +232,7 @@ resource "aws_instance" "compose" {
   vpc_security_group_ids = [
     aws_security_group.compose.id,
     aws_security_group.db_client.id,
+    aws_security_group.public_ip.id,
   ]
 
   lifecycle {
