@@ -152,7 +152,7 @@ resource "aws_security_group_rule" "allow_this_redis_access" {
 resource "aws_instance" "compose" {
   ami                         = data.aws_ami.amzn.id
   instance_type               = var.compose_instance_type
-  key_name                    = var.ec2_keyname
+  key_name                    = var.ec2_keyname == "" ? null : var.ec2_keyname
   subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
   availability_zone           = var.availability_zone
@@ -170,6 +170,7 @@ resource "aws_instance" "compose" {
   }
 
   user_data = base64encode(templatefile("scripts/compose-init.sh", {
+    ec2_public_key = "${var.ec2_public_key}"
     solr_backups_efs_id = "${aws_efs_file_system.solr_backups.id}"
     solr_backups_efs_dns_name = "${aws_efs_file_system.solr_backups.dns_name}"
     db_fcrepo_address = "${module.db_fcrepo.db_instance_address}"

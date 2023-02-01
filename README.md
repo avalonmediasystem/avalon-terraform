@@ -12,7 +12,9 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
 
 1. Download and install [Terraform 0.12+](https://www.terraform.io/downloads.html). The scripts have been upgraded to HCL 2 and therefore incompatible with earlier versions of Terraform.
 1. Clone this repo
-1. Create or import an [EC2 key-pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for your region.
+1. Get a public key ready which will be used to access your EC2 instance. It can be either (or both) of:
+    * An [EC2 key-pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) created or imported for your region.
+    * A local SSH public key [generated manually](https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key).
 1. Create an S3 bucket to hold the terraform state file. This is useful when
     executing terraform on multiple machines (or working as a team) because it allows state to remain in sync. 
 1. Create a file `dev.tfbackend` and fill in the previously created bucket name, its region, and a bucket key for where the state file file be stored.
