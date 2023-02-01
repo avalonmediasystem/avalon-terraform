@@ -12,6 +12,10 @@ output "ec2_keyname" {
   value = var.ec2_keyname
 }
 
+output "ec2_public_key" {
+  value = var.ec2_public_key
+}
+
 output "environment" {
   value = var.environment
 }

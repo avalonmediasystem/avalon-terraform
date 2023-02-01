@@ -91,6 +91,14 @@ variable "db_fcrepo_username" {
 
 variable "ec2_keyname" {
   type = string
+  default = ""
+  description = "The name of an AWS EC2 key pair to use for authenticating"
+}
+
+variable "ec2_public_key" {
+  type = string
+  default = ""
+  description = "A SSH public key string to use for authenticating"
 }
 
 variable "email_comments" {

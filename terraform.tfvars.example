@@ -1,7 +1,9 @@
 environment         = "dev"
 #zone_prefix         = ""
 hosted_zone_name    = "mydomain.org"
-ec2_keyname         = "my-ec2-key"
+# At least one of ec2_keyname or ec2_public_key must be set
+#ec2_keyname         = "my-ec2-key"
+#ec2_public_key      = ""
 stack_name          = "mystack"
 ssh_cidr_blocks     = []
 fcrepo_binary_bucket_username   = "iam_user"

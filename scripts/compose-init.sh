@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Add SSH public key if var was set
+if [[ -n "${ec2_public_key}" ]]; then
+    # But first ensure existance and correct permissions
+    sudo -Hu ec2-user bash <<- EOF
+	umask 0077
+	mkdir -p /home/ec2-user/.ssh
+	touch /home/ec2-user/.ssh/authorized_keys
+	EOF
+    echo "${ec2_public_key}" >> /home/ec2-user/.ssh/authorized_keys
+fi
+
 # Create filesystem only if there isn't one
 if [[ !  `sudo file -s /dev/xvdh` == *"Linux"* ]]; then 
   sudo mkfs -t ext4 /dev/xvdh
