@@ -236,7 +236,7 @@ resource "aws_instance" "compose" {
   ]
 
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, user_data]
   }
 }
 
