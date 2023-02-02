@@ -211,7 +211,7 @@ resource "aws_instance" "compose" {
     avalon_repo = "${var.avalon_repo}"
     redis_host_name = "${aws_route53_record.redis.name}"
     aws_region = "${var.aws_region}"
-    avalon_fqdn = "${aws_route53_record.alb.fqdn}"
+    avalon_fqdn = "${length(var.alt_hostname) > 0 ? values(var.alt_hostname)[0].hostname : aws_route53_record.alb.fqdn}"
     streaming_fqdn = "${aws_route53_record.alb_streaming.fqdn}"
     elastictranscoder_pipeline_id = "${aws_elastictranscoder_pipeline.this_pipeline.id}"
     email_comments = "${var.email_comments}"

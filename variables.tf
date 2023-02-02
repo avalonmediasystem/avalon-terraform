@@ -1,3 +1,22 @@
+variable "alt_hostname" {
+  description = "Specify an alternative hostname for the public website url (instead of public_zone_name)"
+  type    = map(object({
+              zone_id = string
+              hostname = string
+            }))
+  default = {}
+  #
+  #  To use alt_hostname, you first need to delegate it as a DNS zone to Route53.
+  #  AWS will then create appropriate DNS records.
+  #
+  # alt_hostname = {
+  #                "my-zone" = {
+  #                  zone_id = "Z0123456789ABCDEFGHI"
+  #                  hostname = "my-alt.added.domain.edu"
+  #                }
+  #              }
+}
+
 variable "app_name" {
   default = "avalon"
 }
