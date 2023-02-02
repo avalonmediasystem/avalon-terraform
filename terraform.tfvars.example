@@ -9,6 +9,16 @@ ssh_cidr_blocks     = []
 fcrepo_binary_bucket_username   = "iam_user"
 fcrepo_binary_bucket_access_key = "***********"
 fcrepo_binary_bucket_secret_key = "***********"
+# You can use an alternate hostname for the main web interface rather
+# than the default of {zone_prefix}{environment}.{hosted_zone_name}
+# To do so, you must delegate the domain where the hostname will reside
+# to AWS Route53 and specify the zone_id and hostname like below.
+#alt_hostname        = {
+#                      "my-label" = {
+#                        zone_id = "Z0123456789ABCDEFGHI"
+#                        hostname = "my-alt.domain.org"
+#                      }
+#                    }
 tags = {
   Creator    = "Username"
   For        = "Avalon Turnkey"
