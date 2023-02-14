@@ -157,9 +157,22 @@ data "aws_iam_policy_document" "fcrepo_binary_bucket_access" {
   }
 }
 
+# Create fcrepo bucket user if none was provided
+resource "aws_iam_user" "fcrepo_bin_created_user" {
+  for_each = length(var.fcrepo_binary_bucket_username) > 0 ? toset([]) : toset(["fcuser"])
+  name = "fcrepo-avalon-${local.namespace}"
+  tags = local.common_tags
+}
+
+# Create user access and secret ids if user was created
+resource "aws_iam_access_key" "fcrepo_bin_created_access" {
+  for_each = length(var.fcrepo_binary_bucket_username) > 0 ? toset([]) : toset(["fcuser"])
+  user = values(aws_iam_user.fcrepo_bin_created_user)[0].name
+}
+
 resource "aws_iam_user_policy" "fcrepo_binary_bucket_policy" {
   name   = "${local.namespace}-fcrepo-s3-bucket-access"
-  user   = var.fcrepo_binary_bucket_username
+  user   = length(var.fcrepo_binary_bucket_username) > 0 ? var.fcrepo_binary_bucket_username : values(aws_iam_user.fcrepo_bin_created_user)[0].name
   policy = data.aws_iam_policy_document.fcrepo_binary_bucket_access.json
 }
 

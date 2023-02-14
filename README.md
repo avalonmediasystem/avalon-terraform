@@ -24,7 +24,7 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
     key    = "state.tfstate"
     region = "us-east-1"
     ````
-1. Create an IAM user that Fedora will use to sign its S3 requests.
+1. (Optional) Create an IAM user that Fedora will use to sign its S3 requests. Terraform will create this user automatically if it has permissions to do so.
 1. Create a [public hosted zone in Route53](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html); Terraform will automatically manage DNS entries in this zone. A registered domain name is needed to pair with the Route53 hosted zone. You can [use Route53 to register a new domain](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) or [use Route53 to manage an existing domain](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html).
 1. Copy `terraform.tfvars.example` to `terraform.tfvars` and fill in the relevant information:
     ```
@@ -32,6 +32,7 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
     hosted_zone_name    = "mydomain.org"
     ec2_keyname         = "my-ec2-key"
     stack_name          = "mystack"
+    # Next 3 lines only if you created the IAM user manually
     fcrepo_binary_bucket_username   = "iam_user"
     fcrepo_binary_bucket_access_key = "***********"
     fcrepo_binary_bucket_secret_key = "***********"
