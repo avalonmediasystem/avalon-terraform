@@ -138,14 +138,20 @@ variable "environment" {
 
 variable "fcrepo_binary_bucket_username" {
   type = string
+  default = ""
+  description = "AWS IAM user for fedora bucket (will attempt to create if left blank)"
 }
 
 variable "fcrepo_binary_bucket_access_key" {
   type = string
+  default = ""
+  description = "AWS IAM user access key for fedora bucket (will attempt to create if username blank)"
 }
 
 variable "fcrepo_binary_bucket_secret_key" {
   type = string
+  default = ""
+  description = "AWS IAM user secret key for fedora bucket (will attempt to create if username blank)"
 }
 
 variable "fcrepo_db_ssl" {
