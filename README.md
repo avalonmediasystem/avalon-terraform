@@ -72,7 +72,7 @@ Turnkey comes bundled with [Persona](https://github.com/samvera-labs/samvera-per
 # Maintenance
 
 ## Upgrading Avalon
-Upgrading the version of Avalon running in the stack happens by running the CodeBuild build created by terraform and not through terraform apply.  If you have customized your Avalon instace, first rebase your changes on top of the latest Avalon release, resolve conflicts, and push to your branch.
+Upgrading the version of Avalon running in the stack happens by running the CodeBuild build created by terraform and not through `terraform apply`.  If you have customized your Avalon instance, first rebase your changes on top of the latest Avalon release, resolve conflicts, and push to your branch.
 
 Then log into the AWS console and go to CodeBuild.  Go into the details of the build created by terraform (e.g. "avalon-demo-build-project") and click "Start Build".  This will rebuild the container image from the Avalon code branch used initially when bringing up the stack.  The built image is pushed to the AWS container registry and an SSM message triggers pulling down the new image and restarting docker-compose on the EC2 instance.
 
