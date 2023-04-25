@@ -85,3 +85,109 @@ resource "aws_elastictranscoder_pipeline" "this_pipeline" {
   }
 }
 
+locals {
+  containers = [
+    { container = "ts", description = "hls" },
+    { container = "mp4", description = "mp4" }
+  ]
+
+  audio_qualities = [
+    { quality = "high",   audio_bit_rate = "320" },
+    { quality = "medium", audio_bit_rate = "128" }
+  ]
+
+  audio_presets = [
+    for config in setproduct(local.audio_qualities, local.containers) : {
+      container = config[1].container
+      name = "${local.namespace}-audio-${config[0].quality}-${config[1].description}"
+      description = "Avalon Media System: video/${config[0].quality}/${config[1].description}"
+      audio_bit_rate = config[0].audio_bit_rate
+    }
+  ]
+
+  video_qualities = [
+    { quality = "high",   audio_bit_rate = "192", video_bit_rate = "2048", max_width = "1920", max_height = "1080" },
+    { quality = "medium", audio_bit_rate = "128", video_bit_rate = "1024", max_width = "1280", max_height =  "720" },
+    { quality = "low",    audio_bit_rate = "128", video_bit_rate =  "500", max_width =  "720", max_height =  "480" }
+  ]
+
+  video_presets = [
+    for config in setproduct(local.video_qualities, local.containers) : {
+      container = config[1].container
+      name = "${local.namespace}-video-${config[0].quality}-${config[1].description}"
+      description = "Avalon Media System: video/${config[0].quality}/${config[1].description}"
+      audio_bit_rate = config[0].audio_bit_rate
+      video_bit_rate = config[0].video_bit_rate
+      max_width = config[0].max_width
+      max_height = config[0].max_height
+    }
+  ]
+}
+
+resource "aws_elastictranscoder_preset" "this_preset_audio" {
+  for_each    = { for preset in local.audio_presets : preset.name => preset }
+  container   = each.value.container
+  description = each.value.description
+  name        = each.key
+
+  audio {
+    audio_packing_mode = "SingleTrack"
+    bit_rate           = each.value.audio_bit_rate
+    channels           = 2
+    codec              = "AAC"
+    sample_rate        = 44100
+  }
+
+  audio_codec_options {
+    profile = "AAC-LC"
+  }
+}
+
+resource "aws_elastictranscoder_preset" "this_preset_video" {
+  for_each    = { for preset in local.video_presets : preset.name => preset }
+  container   = each.value.container
+  description = each.value.description
+  name        = each.key
+
+  audio {
+    audio_packing_mode = "SingleTrack"
+    bit_rate           = each.value.audio_bit_rate
+    channels           = 2
+    codec              = "AAC"
+    sample_rate        = 44100
+  }
+
+  audio_codec_options {
+    profile = "AAC-LC"
+  }
+
+  video {
+    bit_rate             = each.value.video_bit_rate
+    codec                = "H.264"
+    display_aspect_ratio = "auto"
+    fixed_gop            = "true"
+    frame_rate           = "auto"
+    keyframes_max_dist   = 90
+    max_height           = each.value.max_height
+    max_width            = each.value.max_width
+    padding_policy       = "NoPad"
+    sizing_policy        = "ShrinkToFit"
+  }
+
+  video_codec_options = {
+    Profile                  = "main"
+    Level                    = "3.1"
+    MaxReferenceFrames       = 3
+    InterlacedMode           = "Progressive"
+    ColorSpaceConversionMode = "Auto"
+  }
+
+  thumbnails {
+    format         = "png"
+    interval       = 300
+    max_width      = "192"
+    max_height     = "108"
+    padding_policy = "NoPad"
+    sizing_policy  = "ShrinkToFit"
+  }
+}
