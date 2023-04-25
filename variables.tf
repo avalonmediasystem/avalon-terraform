@@ -39,7 +39,7 @@ variable "availability_zone" {
 }
 
 variable "avalon_admin" {
-  default = "admin@example.com"
+  default = ""
 }
 
 variable "avalon_repo" {
