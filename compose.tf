@@ -157,6 +157,7 @@ resource "aws_security_group" "public_ip" {
 }
 
 resource "aws_security_group_rule" "ssh_public_ip" {
+  for_each = toset(length(var.ssh_cidr_blocks) > 0 ? ["1"] : [])
   type = "ingress"
   description = "Allow SSH direct to public IP"
   cidr_blocks = var.ssh_cidr_blocks
