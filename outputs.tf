@@ -12,8 +12,8 @@ output "ec2_keyname" {
   value = var.ec2_keyname
 }
 
-output "ec2_public_key" {
-  value = var.ec2_public_key
+output "ec2_private_keyfile" {
+  value = var.ec2_private_keyfile
 }
 
 output "environment" {
@@ -124,14 +124,6 @@ output "private_subnets" {
 
 output "private_zone_id" {
   value = module.dns.private_zone_id
-}
-
-output "public_ip" {
-  value = aws_instance.compose.public_ip
-}
-
-output "public_zone_name" {
-  value = local.public_zone_name
 }
 
 output "public_subnets" {

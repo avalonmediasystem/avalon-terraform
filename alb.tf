@@ -22,19 +22,10 @@ resource "aws_security_group" "alb" {
   tags        = local.common_tags
 }
 
-resource "aws_security_group_rule" "alb_ingress_http" {
+resource "aws_security_group_rule" "alb_ingress" {
   security_group_id = aws_security_group.alb.id
   type              = "ingress"
   from_port         = "80"
-  to_port           = "80"
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "alb_ingress_https" {
-  security_group_id = aws_security_group.alb.id
-  type              = "ingress"
-  from_port         = "443"
   to_port           = "443"
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -178,7 +169,6 @@ resource "aws_alb_target_group" "alb_streaming" {
 resource "aws_acm_certificate" "web_cert" {
   domain_name       = aws_route53_record.alb.fqdn
   validation_method = "DNS"
-  subject_alternative_names = [for ent in var.alt_hostname : ent.hostname]
 
   tags = local.common_tags
 
@@ -195,34 +185,9 @@ resource "aws_route53_record" "web_cert_validation" {
   ttl     = 60
 }
 
-resource "aws_route53_record" "alt_web_cert_validation" {
-  for_each = length(var.alt_hostname) > 0 ? var.alt_hostname : {}
-  name     = tolist(aws_acm_certificate.web_cert.domain_validation_options)[1].resource_record_name
-  type     = tolist(aws_acm_certificate.web_cert.domain_validation_options)[1].resource_record_type
-  zone_id  = each.value.zone_id
-  records  = [tolist(aws_acm_certificate.web_cert.domain_validation_options)[1].resource_record_value]
-  ttl      = 60
-}
-
-data "dns_a_record_set" "alb_ips" {
-  host = aws_alb.alb.dns_name
-}
-
-resource "aws_route53_record" "alt_dns_zone" {
-  for_each = length(var.alt_hostname) > 0 ? var.alt_hostname : {}
-  name     = each.value.hostname
-  type     = "A"
-  zone_id  = each.value.zone_id
-  records  = data.dns_a_record_set.alb_ips.addrs
-  ttl      = 60
-}
-
 resource "aws_acm_certificate_validation" "web_cert" {
   certificate_arn         = aws_acm_certificate.web_cert.arn
-  validation_record_fqdns = concat(
-                              [aws_route53_record.web_cert_validation.fqdn],
-                              [for record in aws_route53_record.alt_web_cert_validation : record.fqdn]
-                            )
+  validation_record_fqdns = [aws_route53_record.web_cert_validation.fqdn]
 }
 
 # Create, validate and attach streaming certificate 

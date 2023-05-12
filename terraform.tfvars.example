@@ -1,30 +1,14 @@
 environment         = "dev"
-#zone_prefix         = ""
 hosted_zone_name    = "mydomain.org"
-# At least one of ec2_keyname or ec2_public_key must be set
-#ec2_keyname         = "my-ec2-key"
-#ec2_public_key      = ""
+ec2_keyname         = "my-ec2-key"
+ec2_private_keyfile = "/local/path/my-ec2-key.pem"
 stack_name          = "mystack"
-ssh_cidr_blocks     = []
-# If the user below is empty, Terraform will attempt to
-# create it and the required access/secret automatically.
-#fcrepo_binary_bucket_username   = "iam_user"
-#fcrepo_binary_bucket_access_key = "***********"
-#fcrepo_binary_bucket_secret_key = "***********"
+stack_bucket        = "mystack-state"
+sms_notification    = "+18125550123"
 fcrepo_binary_bucket_username   = "iam_user"
 fcrepo_binary_bucket_access_key = "***********"
 fcrepo_binary_bucket_secret_key = "***********"
-# You can use an alternate hostname for the main web interface rather
-# than the default of {zone_prefix}{environment}.{hosted_zone_name}
-# To do so, you must delegate the domain where the hostname will reside
-# to AWS Route53 and specify the zone_id and hostname like below.
-#alt_hostname        = {
-#                      "my-label" = {
-#                        zone_id = "Z0123456789ABCDEFGHI"
-#                        hostname = "my-alt.domain.org"
-#                      }
-#                    }
-tags = {
+tags {
   Creator    = "Username"
   For        = "Avalon Turnkey"
 }

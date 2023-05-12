@@ -12,27 +12,26 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
 
 1. Download and install [Terraform 0.12+](https://www.terraform.io/downloads.html). The scripts have been upgraded to HCL 2 and therefore incompatible with earlier versions of Terraform.
 1. Clone this repo
-1. Get a public key ready which will be used to access your EC2 instance. It can be either (or both) of:
-    * An [EC2 key-pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) created or imported for your region.
-    * A local SSH public key [generated manually](https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key).
-1. Create an S3 bucket to hold the terraform state file. This is useful when
+1. Create or import an [EC2 key-pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for your region.
+1. Create an S3 bucket to hold the terraform state, this is useful when
     executing terraform on multiple machines (or working as a team) because it allows state to remain in sync. 
-1. Create a file `dev.tfbackend` and fill in the previously created bucket name, its region, and a bucket key for where the state file file be stored.
+1. Copy `dev.tfbackend.example` to `dev.tfbackend` and fill in the previously created bucket name.
 
     ```
     bucket = "my-terraform-state"
     key    = "state.tfstate"
     region = "us-east-1"
     ````
-1. (Optional) Create an IAM user that Fedora will use to sign its S3 requests. Terraform will create this user automatically if it has permissions to do so.
+1. Create an IAM user that Fedora will use to sign its S3 requests.
 1. Create a [public hosted zone in Route53](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html); Terraform will automatically manage DNS entries in this zone. A registered domain name is needed to pair with the Route53 hosted zone. You can [use Route53 to register a new domain](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) or [use Route53 to manage an existing domain](http://docs.aws.amazon.com/Route53/latest/DeveloperGuide/MigratingDNS.html).
 1. Copy `terraform.tfvars.example` to `terraform.tfvars` and fill in the relevant information:
     ```
     environment         = "dev"
     hosted_zone_name    = "mydomain.org"
     ec2_keyname         = "my-ec2-key"
+    ec2_private_keyfile = "/local/path/my-ec2-key.pem"
     stack_name          = "mystack"
-    # Next 3 lines only if you created the IAM user manually
+    sms_notification    = "+18125550123"
     fcrepo_binary_bucket_username   = "iam_user"
     fcrepo_binary_bucket_access_key = "***********"
     fcrepo_binary_bucket_secret_key = "***********"
