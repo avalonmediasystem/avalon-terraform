@@ -16,6 +16,15 @@
 **/node_modules
 **/package-lock.json
 
+# Lock file
+.terraform.lock.hcl
+
+# SSH keys
+*.pem
+
+# Swap files
+*.sw?
+
 .env
 applications/**/Dockerrun.aws.json
 stack/applications/**/Dockerrun.aws.json

@@ -1,3 +1,22 @@
+variable "alt_hostname" {
+  description = "Specify an alternative hostname for the public website url (instead of public_zone_name)"
+  type    = map(object({
+              zone_id = string
+              hostname = string
+            }))
+  default = {}
+  #
+  #  To use alt_hostname, you first need to delegate it as a DNS zone to Route53.
+  #  AWS will then create appropriate DNS records.
+  #
+  # alt_hostname = {
+  #                "my-zone" = {
+  #                  zone_id = "Z0123456789ABCDEFGHI"
+  #                  hostname = "my-alt.added.domain.edu"
+  #                }
+  #              }
+}
+
 variable "app_name" {
   default = "avalon"
 }
@@ -20,7 +39,7 @@ variable "availability_zone" {
 }
 
 variable "avalon_admin" {
-  default = "admin@example.com"
+  default = ""
 }
 
 variable "avalon_repo" {
@@ -91,10 +110,14 @@ variable "db_fcrepo_username" {
 
 variable "ec2_keyname" {
   type = string
+  default = ""
+  description = "The name of an AWS EC2 key pair to use for authenticating"
 }
 
-variable "ec2_private_keyfile" {
+variable "ec2_public_key" {
   type = string
+  default = ""
+  description = "A SSH public key string to use for authenticating"
 }
 
 variable "email_comments" {
@@ -115,14 +138,20 @@ variable "environment" {
 
 variable "fcrepo_binary_bucket_username" {
   type = string
+  default = ""
+  description = "AWS IAM user for fedora bucket (will attempt to create if left blank)"
 }
 
 variable "fcrepo_binary_bucket_access_key" {
   type = string
+  default = ""
+  description = "AWS IAM user access key for fedora bucket (will attempt to create if username blank)"
 }
 
 variable "fcrepo_binary_bucket_secret_key" {
   type = string
+  default = ""
+  description = "AWS IAM user secret key for fedora bucket (will attempt to create if username blank)"
 }
 
 variable "fcrepo_db_ssl" {
@@ -143,22 +172,14 @@ variable "postgres_version" {
 #  type = string
 #}
 
+variable "ssh_cidr_blocks" {
+  description = "Allow inbound SSH connections from given CIDR ranges"
+  type    = list(string)
+  default = []
+}
+
 variable "stack_name" {
   default = "stack"
-}
-
-variable "stack_bucket" {
-  type = string
-}
-
-variable "stack_key" {
-  type    = string
-  default = "stack.tfstate"
-}
-
-variable "stack_region" {
-  type    = string
-  default = "us-east-1"
 }
 
 variable "tags" {
@@ -180,10 +201,16 @@ variable "vpc_private_subnets" {
   default = ["10.1.1.0/24", "10.1.3.0/24", "10.1.5.0/24"]
 }
 
+variable "zone_prefix" {
+  description = "An optional prefix string to the hosted zone names"
+  type = string
+  default = ""
+}
+
 locals {
   namespace         = "${var.stack_name}-${var.environment}"
-  public_zone_name  = "${var.environment}.${var.hosted_zone_name}"
-  private_zone_name = "vpc.${var.environment}.${var.hosted_zone_name}"
+  public_zone_name  = "${var.zone_prefix}${var.environment}.${var.hosted_zone_name}"
+  private_zone_name = "vpc.${var.zone_prefix}${var.environment}.${var.hosted_zone_name}"
 
   common_tags = merge(
     var.tags,

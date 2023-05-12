@@ -128,7 +128,7 @@ resource "aws_security_group_rule" "compose_ssh" {
   from_port         = "22"
   to_port           = "22"
   protocol          = "tcp"
-  cidr_blocks       = [var.vpc_cidr_block]
+  cidr_blocks       = setunion([var.vpc_cidr_block], var.ssh_cidr_blocks)
 }
 
 resource "aws_security_group_rule" "compose_egress" {
@@ -149,10 +149,29 @@ resource "aws_security_group_rule" "allow_this_redis_access" {
   source_security_group_id = aws_security_group.compose.id
 }
 
+resource "aws_security_group" "public_ip" {
+  name        = "${local.namespace}-ssh-public-ip"
+  description = "SSH Public IP Security Group"
+  tags        = local.common_tags
+  vpc_id      = module.vpc.vpc_id
+}
+
+resource "aws_security_group_rule" "ssh_public_ip" {
+  for_each = toset(length(var.ssh_cidr_blocks) > 0 ? ["1"] : [])
+  type = "ingress"
+  description = "Allow SSH direct to public IP"
+  cidr_blocks = var.ssh_cidr_blocks
+  ipv6_cidr_blocks = []
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  security_group_id = aws_security_group.public_ip.id
+}
+
 resource "aws_instance" "compose" {
   ami                         = data.aws_ami.amzn.id
   instance_type               = var.compose_instance_type
-  key_name                    = var.ec2_keyname
+  key_name                    = var.ec2_keyname == "" ? null : var.ec2_keyname
   subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
   availability_zone           = var.availability_zone
@@ -170,6 +189,7 @@ resource "aws_instance" "compose" {
   }
 
   user_data = base64encode(templatefile("scripts/compose-init.sh", {
+    ec2_public_key = "${var.ec2_public_key}"
     solr_backups_efs_id = "${aws_efs_file_system.solr_backups.id}"
     solr_backups_efs_dns_name = "${aws_efs_file_system.solr_backups.dns_name}"
     db_fcrepo_address = "${module.db_fcrepo.db_instance_address}"
@@ -179,8 +199,8 @@ resource "aws_instance" "compose" {
     db_avalon_address = "${module.db_avalon.db_instance_address}"
     db_avalon_username = "${module.db_avalon.db_instance_username}"
     db_avalon_password = "${module.db_avalon.db_instance_password}"
-    fcrepo_binary_bucket_access_key = "${var.fcrepo_binary_bucket_access_key}"
-    fcrepo_binary_bucket_secret_key = "${var.fcrepo_binary_bucket_secret_key}"
+    fcrepo_binary_bucket_access_key = "${length(var.fcrepo_binary_bucket_username) > 0 ? var.fcrepo_binary_bucket_access_key : values(aws_iam_access_key.fcrepo_bin_created_access)[0].id }"
+    fcrepo_binary_bucket_secret_key = "${length(var.fcrepo_binary_bucket_username) > 0 ? var.fcrepo_binary_bucket_secret_key : values(aws_iam_access_key.fcrepo_bin_created_access)[0].secret }"
     fcrepo_binary_bucket_id = "${aws_s3_bucket.fcrepo_binary_bucket.id}"
     compose_log_group_name = "${aws_cloudwatch_log_group.compose_log_group.name}"
     fcrepo_db_ssl = "${var.fcrepo_db_ssl}"
@@ -192,7 +212,7 @@ resource "aws_instance" "compose" {
     avalon_repo = "${var.avalon_repo}"
     redis_host_name = "${aws_route53_record.redis.name}"
     aws_region = "${var.aws_region}"
-    avalon_fqdn = "${aws_route53_record.alb.fqdn}"
+    avalon_fqdn = "${length(var.alt_hostname) > 0 ? values(var.alt_hostname)[0].hostname : aws_route53_record.alb.fqdn}"
     streaming_fqdn = "${aws_route53_record.alb_streaming.fqdn}"
     elastictranscoder_pipeline_id = "${aws_elastictranscoder_pipeline.this_pipeline.id}"
     email_comments = "${var.email_comments}"
@@ -213,10 +233,11 @@ resource "aws_instance" "compose" {
   vpc_security_group_ids = [
     aws_security_group.compose.id,
     aws_security_group.db_client.id,
+    aws_security_group.public_ip.id,
   ]
 
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, user_data]
   }
 }
 
