@@ -4,6 +4,7 @@ module "db_avalon_password" {
 
 module "db_avalon" {
   source  = "terraform-aws-modules/rds/aws"
+  version = "~> 5.0"
 
   identifier = "${local.namespace}-avalon-db"
 
