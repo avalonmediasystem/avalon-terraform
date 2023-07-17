@@ -126,6 +126,10 @@ output "private_zone_id" {
   value = module.dns.private_zone_id
 }
 
+output "public_ec2_hostname" {
+  value = aws_route53_record.ec2_hostname.fqdn
+}
+
 output "public_ip" {
   value = aws_instance.compose.public_ip
 }

@@ -241,6 +241,14 @@ resource "aws_instance" "compose" {
   }
 }
 
+resource "aws_route53_record" "ec2_hostname" {
+  zone_id = module.dns.public_zone_id
+  name    = local.ec2_hostname
+  type    = "A"
+  ttl     = 300
+  records = [aws_instance.compose.public_ip]
+}
+
 resource "null_resource" "install_docker_on_compose" {
   triggers = {
     host = aws_instance.compose.id
