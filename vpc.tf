@@ -1,5 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 3.0"
 
   name = "${local.namespace}-vpc"
 
@@ -19,6 +20,7 @@ module "vpc" {
 
 module "endpoints" {
   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "~> 3.0"
 
   vpc_id             = module.vpc.vpc_id
   security_group_ids = [module.vpc.default_security_group_id]

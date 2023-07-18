@@ -211,6 +211,7 @@ locals {
   namespace         = "${var.stack_name}-${var.environment}"
   public_zone_name  = "${var.zone_prefix}${var.environment}.${var.hosted_zone_name}"
   private_zone_name = "vpc.${var.zone_prefix}${var.environment}.${var.hosted_zone_name}"
+  ec2_hostname      = "ec2.${local.public_zone_name}"
 
   common_tags = merge(
     var.tags,

@@ -4,6 +4,7 @@ module "db_fcrepo_password" {
 
 module "db_fcrepo" {
   source  = "terraform-aws-modules/rds/aws"
+  version = "~> 5.0"
 
   identifier = "${local.namespace}-fcrepo-db"
 
