@@ -213,8 +213,12 @@ resource "aws_route53_record" "alt_dns_zone" {
   name     = each.value.hostname
   type     = "A"
   zone_id  = each.value.zone_id
-  records  = data.dns_a_record_set.alb_ips.addrs
-  ttl      = 60
+
+  alias {
+    name                   = aws_alb.alb.dns_name
+    zone_id                = aws_alb.alb.zone_id
+    evaluate_target_health = false
+  }
 }
 
 resource "aws_acm_certificate_validation" "web_cert" {
