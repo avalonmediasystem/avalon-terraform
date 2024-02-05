@@ -172,7 +172,7 @@ variable "hosted_zone_name" {
 }
 
 variable "postgres_version" {
-  default = "14.10"
+  default = "14.12"
 }
 
 #variable "sms_notification" {
