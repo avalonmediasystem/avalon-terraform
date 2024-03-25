@@ -43,11 +43,18 @@ variable "avalon_admin" {
 }
 
 variable "avalon_repo" {
+  description = "The repository to pull when building the Avalon image"
   default = "https://github.com/avalonmediasystem/avalon"
 }
 
 variable "avalon_branch" {
+  description = "The branch to use when building the Avalon image"
   default = "demo"
+}
+
+variable "avalon_commit" {
+  description = "The full commit hash to use when building the Avalon image (empty defaults to most recent for the avalon_branch)"
+  default = ""
 }
 
 variable "bib_retriever_protocol" {

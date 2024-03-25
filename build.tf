@@ -117,6 +117,11 @@ resource "aws_codebuild_project" "docker" {
     }
 
     environment_variable {
+      name  = "AVALON_COMMIT"
+      value = var.avalon_commit
+    }
+
+    environment_variable {
       name  = "AVALON_BRANCH"
       value = var.avalon_branch
       # type  = "PARAMETER_STORE"
@@ -146,18 +151,19 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AVALON_DOCKER_REPO
-      - AVALON_REV=`git ls-remote $AVALON_REPO refs/heads/$AVALON_BRANCH | cut -f 1`
-      - AVALON_DOCKER_CACHE_TAG=$AVALON_REV
+      - (test -z "$AVALON_COMMIT" && AVALON_COMMIT=`git ls-remote $AVALON_REPO refs/heads/$AVALON_BRANCH | cut -f 1`) || true
+      - AVALON_DOCKER_CACHE_TAG=$AVALON_COMMIT
       - docker pull $AVALON_DOCKER_REPO:$AVALON_DOCKER_CACHE_TAG || docker pull $AVALON_DOCKER_REPO:latest || true
   build:
     commands:
-       - git clone -b $AVALON_BRANCH --single-branch $AVALON_REPO
-       - DOCKER_BUILDKIT=1 docker build -t $AVALON_DOCKER_REPO:$AVALON_REV -t $AVALON_DOCKER_REPO:latest --target=prod avalon
+       - git clone -b $AVALON_BRANCH --single-branch $AVALON_REPO avalon
+       - git -C avalon reset --hard $AVALON_COMMIT
+       - DOCKER_BUILDKIT=1 docker build -t $AVALON_DOCKER_REPO:$AVALON_COMMIT -t $AVALON_DOCKER_REPO:latest --target=prod avalon
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker push $AVALON_DOCKER_REPO:$AVALON_REV 
+      - docker push $AVALON_DOCKER_REPO:$AVALON_COMMIT
       - docker push $AVALON_DOCKER_REPO:latest
       - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["${aws_instance.compose.id}"]}]' --parameters '{"commands":["$(aws ecr get-login --region ${local.region} --no-include-email) && docker-compose pull && docker-compose up -d"],"workingDirectory":["/home/ec2-user/avalon-docker-aws_min"],"executionTimeout":["360"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"avalon-${var.environment}/ssm","CloudWatchOutputEnabled":true}' --region us-east-1
 BUILDSPEC
