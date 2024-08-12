@@ -43,6 +43,17 @@ resource "aws_s3_bucket" "this_supplemental_files" {
   force_destroy = "false"
 }
 
+resource "aws_s3_bucket_cors_configuration" "this_supplemental_files" {
+  bucket = aws_s3_bucket.this_supplemental_files.id
+
+  cors_rule {
+    allowed_origins = ["*"]
+    allowed_methods = ["GET"]
+    max_age_seconds = "3000"
+    allowed_headers = ["Authorization", "Access-Control-Allow-Origin"]
+  }
+}
+
 data "aws_iam_policy_document" "this_bucket_access" {
   statement {
     effect    = "Allow"
