@@ -228,6 +228,7 @@ resource "aws_instance" "compose" {
     bib_retriever_attribute = "${var.bib_retriever_attribute}"
     bib_retriever_class = "${var.bib_retriever_class}"
     bib_retriever_class_require = "${var.bib_retriever_class_require}"
+    extra_docker_environment_variables = var.extra_docker_environment_variables
   }))
 
   vpc_security_group_ids = [
