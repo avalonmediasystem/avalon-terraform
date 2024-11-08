@@ -143,6 +143,12 @@ variable "environment" {
   type = string
 }
 
+variable "extra_docker_environment_variables" {
+  description = "These are passed in to the compose-init.sh script"
+  type = map(string)
+  default = {}
+}
+
 variable "fcrepo_binary_bucket_username" {
   type = string
   default = ""

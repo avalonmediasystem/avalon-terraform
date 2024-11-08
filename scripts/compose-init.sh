@@ -81,5 +81,8 @@ SETTINGS__ACTIVE_STORAGE__SERVICE=amazon
 SETTINGS__ACTIVE_STORAGE__BUCKET=${supplemental_files_bucket_id}
 
 CDN_HOST=https://${avalon_fqdn}
+%{ for key, value in extra_docker_environment_variables ~}
+${key}=${value}
+%{ endfor ~}
 EOF
 sudo chown -R ec2-user /home/ec2-user/avalon-docker-aws_min
