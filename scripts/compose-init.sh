@@ -48,7 +48,7 @@ AVALON_REPO=${avalon_repo}
 
 DATABASE_URL=postgres://${db_avalon_username}:${db_avalon_password}@${db_avalon_address}/avalon
 ELASTICACHE_HOST=${redis_host_name}
-SECRET_KEY_BASE=112f7d33c8864e0ef22910b45014a1d7925693ef549850974631021864e2e67b16f44aa54a98008d62f6874360284d00bb29dc08c166197d043406b42190188a
+SECRET_KEY_BASE=$(tr -dc 0-9A-Za-z </dev/random 2>&- | head -c 64)
 AVALON_BRANCH=main
 AWS_REGION=${aws_region}
 RAILS_LOG_TO_STDOUT=true
