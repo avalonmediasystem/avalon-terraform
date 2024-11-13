@@ -2,36 +2,34 @@
 
 # Add SSH public key if var was set
 if [[ -n "${ec2_public_key}" ]]; then
-    # But first ensure existance and correct permissions
-    sudo -Hu ec2-user bash <<- EOF
-	umask 0077
-	mkdir -p /home/ec2-user/.ssh
-	touch /home/ec2-user/.ssh/authorized_keys
-	EOF
-    echo "${ec2_public_key}" >> /home/ec2-user/.ssh/authorized_keys
+    install -d -m 0755 -o ec2-user -g ec2-user ~ec2-user/.ssh
+    touch ~ec2-user/.ssh/authorized_keys
+    chown ec2-user: ~ec2-user/.ssh/authorized_keys
+    chmod 0644 ~ec2-user/.ssh/authorized_keys
+    printf %s\\n "${ec2_public_key}" >>~ec2-user/.ssh/authorized_keys
 fi
 
 # Create filesystem only if there isn't one
-if [[ !  `sudo file -s /dev/xvdh` == *"Linux"* ]]; then 
-  sudo mkfs -t ext4 /dev/xvdh
+if [[ !  `file -s /dev/xvdh` == *"Linux"* ]]; then 
+  mkfs -t ext4 /dev/xvdh
 fi
 
-sudo mkdir /srv/solr_data
-sudo mount /dev/xvdh /srv/solr_data
-sudo chown -R 8983:8983 /srv/solr_data
-sudo echo /dev/xvdh  /srv/solr_data ext4 defaults,nofail 0 2 >> /etc/fstab
+mkdir /srv/solr_data
+mount /dev/xvdh /srv/solr_data
+chown -R 8983:8983 /srv/solr_data
+echo /dev/xvdh  /srv/solr_data ext4 defaults,nofail 0 2 >> /etc/fstab
 
 # Setup
-echo '${solr_backups_efs_id}:/ /srv/solr_backups nfs nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0' | sudo tee -a /etc/fstab
-sudo mkdir -p /srv/solr_backups && sudo mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev ${solr_backups_efs_dns_name}:/ /srv/solr_backups
-sudo chown 8983:8983 /srv/solr_backups
-sudo yum install -y docker && sudo usermod -a -G docker ec2-user && sudo systemctl enable --now docker
-sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+echo '${solr_backups_efs_id}:/ /srv/solr_backups nfs nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0' | tee -a /etc/fstab
+mkdir -p /srv/solr_backups && mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev ${solr_backups_efs_dns_name}:/ /srv/solr_backups
+chown 8983:8983 /srv/solr_backups
+yum install -y docker && usermod -a -G docker ec2-user && systemctl enable --now docker
+curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
 
-sudo wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip -O /home/ec2-user/aws_min.zip && cd /home/ec2-user && unzip aws_min.zip
+wget https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip -O /home/ec2-user/aws_min.zip && cd /home/ec2-user && unzip aws_min.zip
 # Create .env file
-sudo cat << EOF > /home/ec2-user/avalon-docker-aws_min/.env
+cat << EOF > /home/ec2-user/avalon-docker-aws_min/.env
 FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${db_fcrepo_address} -Dfcrepo.postgresql.username=${db_fcrepo_username} -Dfcrepo.postgresql.password=${db_fcrepo_password} -Dfcrepo.postgresql.port=${db_fcrepo_port} -Daws.accessKeyId=${fcrepo_binary_bucket_access_key} -Daws.secretKey=${fcrepo_binary_bucket_secret_key} -Daws.bucket=${fcrepo_binary_bucket_id}
 FEDORA_LOGGROUP=${compose_log_group_name}/fedora.log
 FEDORA_MODESHAPE_CONFIG=classpath:/config/jdbc-postgresql-s3/repository${fcrepo_db_ssl ? "-ssl" : ""}.json
@@ -85,4 +83,4 @@ CDN_HOST=https://${avalon_fqdn}
 ${key}=${value}
 %{ endfor ~}
 EOF
-sudo chown -R ec2-user /home/ec2-user/avalon-docker-aws_min
+chown -R ec2-user /home/ec2-user/avalon-docker-aws_min
