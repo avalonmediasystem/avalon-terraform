@@ -117,7 +117,7 @@ variable "db_fcrepo_username" {
 
 variable "ec2_keyname" {
   type = string
-  default = ""
+  default = null
   description = "The name of an AWS EC2 key pair to use for authenticating"
 }
 
@@ -125,6 +125,15 @@ variable "ec2_public_key" {
   type = string
   default = ""
   description = "A SSH public key string to use for authenticating"
+}
+
+variable "ec2_users" {
+  type = map(object({
+    gecos = optional(string, "")
+    ssh_keys = optional(list(string), [])
+    setup_commands = optional(list(string), [])
+  }))
+  default = {}
 }
 
 variable "email_comments" {

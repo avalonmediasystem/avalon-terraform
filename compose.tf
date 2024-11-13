@@ -190,6 +190,7 @@ resource "aws_instance" "compose" {
 
   user_data = base64encode(templatefile("scripts/compose-init.sh", {
     ec2_public_key = "${var.ec2_public_key}"
+    ec2_users = var.ec2_users
     solr_backups_efs_id = "${aws_efs_file_system.solr_backups.id}"
     solr_backups_efs_dns_name = "${aws_efs_file_system.solr_backups.dns_name}"
     db_fcrepo_address = "${module.db_fcrepo.db_instance_address}"

@@ -9,6 +9,24 @@ if [[ -n "${ec2_public_key}" ]]; then
     printf %s\\n "${ec2_public_key}" >>~ec2-user/.ssh/authorized_keys
 fi
 
+groupadd --system docker
+
+# Allow all users in the wheel group to run all commands without a password.
+sed -i 's/^# \(%wheel\s\+ALL=(ALL)\s\+NOPASSWD: ALL$\)/\1/' /etc/sudoers
+
+%{ for username, user_config in ec2_users ~}
+useradd --comment "${user_config.gecos}" --groups adm,wheel,docker "${username}"
+install -d -o "${username}" -g "${username}" ~${username}/.ssh
+install -m 0644 -o "${username}" -g "${username}" \
+    /dev/null ~${username}/.ssh/authorized_keys
+%{ for ssh_key in user_config.ssh_keys ~}
+printf %s\\n "${ssh_key}" >>~${username}/.ssh/authorized_keys
+%{ endfor ~}
+%{ for setup_command in user_config.setup_commands ~}
+${setup_command}
+%{ endfor }
+%{ endfor ~}
+
 # Create filesystem only if there isn't one
 if [[ !  `file -s /dev/xvdh` == *"Linux"* ]]; then 
   mkfs -t ext4 /dev/xvdh
