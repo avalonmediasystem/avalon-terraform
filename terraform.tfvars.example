@@ -1,9 +1,26 @@
 environment         = "dev"
 #zone_prefix         = ""
 hosted_zone_name    = "mydomain.org"
-# At least one of ec2_keyname or ec2_public_key must be set
+# At least one of 'ec2_keyname' or 'ec2_public_key', or 'ec2_users' must be set
+# for you to have access to your EC2 instance.
 #ec2_keyname         = "my-ec2-key"
 #ec2_public_key      = ""
+#ec2_users = [
+#    user = {
+#        ssh_keys = [
+#            "ssh-ed25519 ..."
+#        ]
+#    }
+#    another = {
+#        gecos = "Another User"
+#        ssh_keys = [
+#            "ssh-rsa ..."
+#        ]
+#        setup_commands = [
+#            "echo 'set editing-mode vi' | install -m 0644 -o another -g another /dev/stdin ~another/.inputrc"
+#        ]
+#    }
+#]
 stack_name          = "mystack"
 ssh_cidr_blocks     = []
 # If the user below is empty, Terraform will attempt to
