@@ -36,6 +36,10 @@ data "aws_iam_policy_document" "compose" {
   }
 }
 
+locals {
+  solr_data_device_name = "/dev/sdh"
+}
+
 resource "aws_iam_policy" "this_bucket_policy" {
   name   = "${local.namespace}-compose-bucket-access"
   policy = data.aws_iam_policy_document.this_bucket_access.json
@@ -191,6 +195,7 @@ resource "aws_instance" "compose" {
   user_data = base64encode(templatefile("scripts/compose-init.sh", {
     ec2_public_key = "${var.ec2_public_key}"
     ec2_users = var.ec2_users
+    solr_data_device_name = local.solr_data_device_name
     solr_backups_efs_id = "${aws_efs_file_system.solr_backups.id}"
     solr_backups_efs_dns_name = "${aws_efs_file_system.solr_backups.dns_name}"
     db_fcrepo_address = "${module.db_fcrepo.db_instance_address}"
@@ -290,7 +295,7 @@ resource "aws_cloudwatch_log_group" "compose_log_group" {
 }
 
 resource "aws_volume_attachment" "compose_solr" {
-  device_name = "/dev/sdh"
+  device_name = local.solr_data_device_name
   volume_id   = aws_ebs_volume.solr_data.id
   instance_id = aws_instance.compose.id
 }
