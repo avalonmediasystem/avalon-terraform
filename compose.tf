@@ -243,16 +243,14 @@ resource "aws_instance" "compose" {
     aws_security_group.public_ip.id,
   ]
 
-  lifecycle {
-    ignore_changes = [ami, user_data]
-  }
+  user_data_replace_on_change = true
 }
 
 resource "aws_route53_record" "ec2_hostname" {
   zone_id = module.dns.public_zone_id
   name    = local.ec2_hostname
   type    = "A"
-  ttl     = 300
+  ttl     = 30
   records = [aws_instance.compose.public_ip]
 }
 
