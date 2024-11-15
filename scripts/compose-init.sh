@@ -1,5 +1,7 @@
 #!/bin/bash
 
+declare -r SOLR_DATA_DEVICE=${solr_data_device_name}
+
 # Add SSH public key if var was set
 if [[ -n "${ec2_public_key}" ]]; then
     install -d -m 0755 -o ec2-user -g ec2-user ~ec2-user/.ssh
@@ -27,15 +29,19 @@ ${setup_command}
 %{ endfor }
 %{ endfor ~}
 
-# Create filesystem only if there isn't one
-if [[ !  `file -s /dev/xvdh` == *"Linux"* ]]; then 
-  mkfs -t ext4 /dev/xvdh
-fi
+#
+# Configure Solr data mount.
+#
 
-mkdir /srv/solr_data
-mount /dev/xvdh /srv/solr_data
-chown -R 8983:8983 /srv/solr_data
-echo /dev/xvdh  /srv/solr_data ext4 defaults,nofail 0 2 >> /etc/fstab
+# Only format the Solr disk if it's blank.
+blkid --probe "$SOLR_DATA_DEVICE" -o export | grep -qE "^PTTYPE=|^TYPE=" ||
+    mkfs -t ext4 "$SOLR_DATA_DEVICE"
+
+install -d -m 0 /srv/solr_data
+echo "$SOLR_DATA_DEVICE /srv/solr_data ext4 defaults 0 2" >>/etc/fstab
+# If the mountpoint couldn't be mounted, leave it mode 0 so Solr will fail
+# safely.
+mount /srv/solr_data && chown -R 8983:8983 /srv/solr_data
 
 # Setup
 echo '${solr_backups_efs_id}:/ /srv/solr_backups nfs nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0' | tee -a /etc/fstab
