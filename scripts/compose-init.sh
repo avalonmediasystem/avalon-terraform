@@ -14,9 +14,7 @@ declare -r SOLR_DATA_DEVICE=${solr_data_device_name}
 # Add SSH public key if var was set
 if [[ -n "${ec2_public_key}" ]]; then
     install -d -m 0755 -o ec2-user -g ec2-user ~ec2-user/.ssh
-    touch ~ec2-user/.ssh/authorized_keys
-    chown ec2-user: ~ec2-user/.ssh/authorized_keys
-    chmod 0644 ~ec2-user/.ssh/authorized_keys
+    install -m 0644 -o ec2-user -g ec2-user /dev/null ~ec2-user/.ssh/authorized_keys
     printf %s\\n "${ec2_public_key}" >>~ec2-user/.ssh/authorized_keys
 fi
 
