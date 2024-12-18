@@ -57,6 +57,21 @@ variable "avalon_commit" {
   default = ""
 }
 
+variable "avalon_docker_code_repo" {
+  description = "The avalon-docker repository to pull when running docker-compose"
+  default = "https://github.com/avalonmediasystem/avalon-docker"
+}
+
+variable "avalon_docker_code_branch" {
+  description = "The avalon-docker branch to use when running docker-compose"
+  default = "aws_min"
+}
+
+variable "avalon_docker_code_commit" {
+  description = "The full avalon-docker commit hash to use when running docker-compose (empty defaults to most recent for the avalon_docker_code_branch)"
+  default = ""
+}
+
 variable "bib_retriever_protocol" {
   default = "sru"
 }

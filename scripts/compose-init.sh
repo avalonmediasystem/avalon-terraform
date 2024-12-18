@@ -83,17 +83,19 @@ curl -L "$(printf %s "https://github.com/docker/compose/releases/latest/" \
 rm -rf -- "$tmp"
 unset tmp
 
-curl -L https://github.com/avalonmediasystem/avalon-docker/archive/aws_min.zip |
-    install -m 0644 -o ec2-user -g ec2-user /dev/stdin ~ec2-user/aws_min.zip &&
+declare -r AVALON_DOCKER_CHECKOUT_NAME=%{ if avalon_docker_code_branch != "" }${avalon_docker_code_branch}%{ else }${avalon_docker_code_commit}%{ endif }
+curl -L ${avalon_docker_code_repo}/archive/$AVALON_DOCKER_CHECKOUT_NAME.zip > avalon-docker.zip |
+    install -m 0644 -o ec2-user -g ec2-user /dev/stdin ~ec2-user/avalon-docker.zip &&
     setpriv --reuid ec2-user --regid ec2-user --clear-groups -- \
-        unzip -d ~ec2-user ~ec2-user/aws_min.zip
+        unzip -d ~ec2-user ~ec2-user/avalon-docker.zip
+mv ~ec2-user/avalon-docker-$AVALON_DOCKER_CHECKOUT_NAME ~ec2-user/avalon-docker
 
 #
 # Set up Avalon.
 #
 
 install -m 0600 -o ec2-user -g ec2-user \
-    /dev/stdin ~ec2-user/avalon-docker-aws_min/.env <<EOF
+    /dev/stdin ~ec2-user/avalon-docker/.env <<EOF
 FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${db_fcrepo_address} -Dfcrepo.postgresql.username=${db_fcrepo_username} -Dfcrepo.postgresql.password=${db_fcrepo_password} -Dfcrepo.postgresql.port=${db_fcrepo_port} -Daws.accessKeyId=${fcrepo_binary_bucket_access_key} -Daws.secretKey=${fcrepo_binary_bucket_secret_key} -Daws.bucket=${fcrepo_binary_bucket_id}
 FEDORA_LOGGROUP=${compose_log_group_name}/fedora.log
 FEDORA_MODESHAPE_CONFIG=classpath:/config/jdbc-postgresql-s3/repository${fcrepo_db_ssl ? "-ssl" : ""}.json
