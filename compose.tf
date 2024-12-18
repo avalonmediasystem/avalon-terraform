@@ -216,6 +216,9 @@ resource "aws_instance" "compose" {
     supplemental_files_bucket_id = aws_s3_bucket.this_supplemental_files.id
     avalon_ecr_repository_url = aws_ecr_repository.avalon.repository_url
     avalon_repo = var.avalon_repo
+    avalon_docker_code_repo = var.avalon_docker_code_repo
+    avalon_docker_code_branch = var.avalon_docker_code_branch
+    avalon_docker_code_commit = var.avalon_docker_code_commit
     redis_host_name = aws_route53_record.redis.name
     aws_region = var.aws_region
     avalon_fqdn = length(var.alt_hostname) > 0 ? values(var.alt_hostname)[0].hostname : aws_route53_record.alb.fqdn

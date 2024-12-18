@@ -165,7 +165,7 @@ phases:
       - echo Pushing the Docker images...
       - docker push $AVALON_DOCKER_REPO:$AVALON_COMMIT
       - docker push $AVALON_DOCKER_REPO:latest
-      - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["${aws_instance.compose.id}"]}]' --parameters '{"commands":["$(aws ecr get-login --region ${local.region} --no-include-email) && docker-compose pull && docker-compose up -d"],"workingDirectory":["/home/ec2-user/avalon-docker-aws_min"],"executionTimeout":["360"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"avalon-${var.environment}/ssm","CloudWatchOutputEnabled":true}' --region us-east-1
+      - aws ssm send-command --document-name "AWS-RunShellScript" --document-version "1" --targets '[{"Key":"InstanceIds","Values":["${aws_instance.compose.id}"]}]' --parameters '{"commands":["$(aws ecr get-login --region ${local.region} --no-include-email) && docker-compose pull && docker-compose up -d"],"workingDirectory":["/home/ec2-user/avalon-docker"],"executionTimeout":["360"]}' --timeout-seconds 600 --max-concurrency "50" --max-errors "0" --cloud-watch-output-config '{"CloudWatchLogGroupName":"avalon-${var.environment}/ssm","CloudWatchOutputEnabled":true}' --region us-east-1
 BUILDSPEC
   }
 
