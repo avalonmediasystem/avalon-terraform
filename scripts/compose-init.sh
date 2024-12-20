@@ -82,7 +82,7 @@ rm -rf -- "$tmp"
 unset tmp
 
 declare -r AVALON_DOCKER_CHECKOUT_NAME=%{ if avalon_docker_code_branch != "" }${avalon_docker_code_branch}%{ else }${avalon_docker_code_commit}%{ endif }
-curl -L ${avalon_docker_code_repo}/archive/$AVALON_DOCKER_CHECKOUT_NAME.zip > avalon-docker.zip |
+curl -L ${avalon_docker_code_repo}/archive/$AVALON_DOCKER_CHECKOUT_NAME.zip |
     install -m 0644 -o ec2-user -g ec2-user /dev/stdin ~ec2-user/avalon-docker.zip &&
     setpriv --reuid ec2-user --regid ec2-user --clear-groups -- \
         unzip -d ~ec2-user ~ec2-user/avalon-docker.zip
