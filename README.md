@@ -33,9 +33,9 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
     ec2_keyname         = "my-ec2-key"
     stack_name          = "mystack"
     # Next 3 lines only if you created the IAM user manually
-    fcrepo_binary_bucket_username   = "iam_user"
-    fcrepo_binary_bucket_access_key = "***********"
-    fcrepo_binary_bucket_secret_key = "***********"
+    fcrepo_ocfl_bucket_username   = "iam_user"
+    fcrepo_ocfl_bucket_access_key = "***********"
+    fcrepo_ocfl_bucket_secret_key = "***********"
     tags {
       Creator    = "me"
       AnotherTag = "Whatever value I want!"
@@ -56,6 +56,17 @@ To actually make those changes:
 
 Be patient, the script attempts to register SSL certificates for your domains and AWS cert validation process can take from 5 to 30 minutes.
 
+## Setting up initial admin user
+
+Once your stack is up and running, navigate to your avalon instance and go to sign in then sign up to create a user account.
+
+Then go into your ec2 instance to execute the following:
+```
+sudo su - ec2-user
+cd avalon-docker
+docker-compose exec avalon /bin/bash -c "RAILS_ENV=production bundle exec rake avalon:user:admin"
+```
+
 ## Extra settings
 
 ### Email
@@ -73,9 +84,9 @@ Turnkey comes bundled with [Persona](https://github.com/samvera-labs/samvera-per
 # Maintenance
 
 ## Upgrading Avalon
-Upgrading the version of Avalon running in the stack happens by running the CodeBuild build created by terraform and not through `terraform apply`.  If you have customized your Avalon instance, first rebase your changes on top of the latest Avalon release, resolve conflicts, and push to your branch.
+Upgrading the version of Avalon running in the stack happens by modifying the variables in terraform.tfvars then running `terraform apply`.  If you have customized your Avalon instance, first rebase your changes on top of the latest Avalon release, resolve conflicts, and push to your branch.
 
-Then log into the AWS console and go to CodeBuild.  Go into the details of the build created by terraform (e.g. "avalon-demo-build-project") and click "Start Build".  This will rebuild the container image from the Avalon code branch used initially when bringing up the stack.  The built image is pushed to the AWS container registry and an SSM message triggers pulling down the new image and restarting docker-compose on the EC2 instance.
+This will rebuild the container image from the Avalon code branch specified, push it to the AWS container registry, and send an SSM message that triggers pulling down the new image and restarting docker-compose on the EC2 instance.
 
 
 ## Update the stack

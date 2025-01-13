@@ -25,12 +25,12 @@ stack_name          = "mystack"
 ssh_cidr_blocks     = []
 # If the user below is empty, Terraform will attempt to
 # create it and the required access/secret automatically.
-#fcrepo_binary_bucket_username   = "iam_user"
-#fcrepo_binary_bucket_access_key = "***********"
-#fcrepo_binary_bucket_secret_key = "***********"
-fcrepo_binary_bucket_username   = "iam_user"
-fcrepo_binary_bucket_access_key = "***********"
-fcrepo_binary_bucket_secret_key = "***********"
+#fcrepo_ocfl_bucket_username   = "iam_user"
+#fcrepo_ocfl_bucket_access_key = "***********"
+#fcrepo_ocfl_bucket_secret_key = "***********"
+fcrepo_ocfl_bucket_username   = "iam_user"
+fcrepo_ocfl_bucket_access_key = "***********"
+fcrepo_ocfl_bucket_secret_key = "***********"
 # You can use an alternate hostname for the main web interface rather
 # than the default of {zone_prefix}{environment}.{hosted_zone_name}
 # To do so, you must delegate the domain where the hostname will reside
