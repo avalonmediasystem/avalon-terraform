@@ -94,9 +94,8 @@ mv ~ec2-user/avalon-docker-$AVALON_DOCKER_CHECKOUT_NAME ~ec2-user/avalon-docker
 
 install -m 0600 -o ec2-user -g ec2-user \
     /dev/stdin ~ec2-user/avalon-docker/.env <<EOF
-FEDORA_OPTIONS=-Dfcrepo.postgresql.host=${db_fcrepo_address} -Dfcrepo.postgresql.username=${db_fcrepo_username} -Dfcrepo.postgresql.password=${db_fcrepo_password} -Dfcrepo.postgresql.port=${db_fcrepo_port} -Daws.accessKeyId=${fcrepo_binary_bucket_access_key} -Daws.secretKey=${fcrepo_binary_bucket_secret_key} -Daws.bucket=${fcrepo_binary_bucket_id}
+FEDORA_OPTIONS=-Dfcrepo.db.url=jdbc:postgresql://${db_fcrepo_address}:${db_fcrepo_port}/fcrepo_cache -Dfcrepo.db.user=${db_fcrepo_username} -Dfcrepo.db.password=${db_fcrepo_password} -Dfcrepo.aws.access-key=${fcrepo_ocfl_bucket_access_key} -Dfcrepo.aws.secret-key=${fcrepo_ocfl_bucket_secret_key} -Dfcrepo.storage=ocfl-s3 -Dfcrepo.ocfl.s3.bucket=${fcrepo_ocfl_bucket_id} -Dfcrepo.autoversioning.enabled=false
 FEDORA_LOGGROUP=${compose_log_group_name}/fedora.log
-FEDORA_MODESHAPE_CONFIG=classpath:/config/jdbc-postgresql-s3/repository${fcrepo_db_ssl ? "-ssl" : ""}.json
 
 SOLR_LOGGROUP=${compose_log_group_name}/solr.log
 S3_HELPER_LOGROUP=${compose_log_group_name}/s3-helper.log

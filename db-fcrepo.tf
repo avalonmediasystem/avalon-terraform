@@ -6,7 +6,7 @@ module "db_fcrepo" {
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 5.0"
 
-  identifier = "${local.namespace}-fcrepo-db"
+  identifier = "${local.namespace}-fcrepo-db-cache"
 
   engine         = "postgres"
   engine_version = var.postgres_version
@@ -16,7 +16,7 @@ module "db_fcrepo" {
   instance_class    = "db.t3.micro"
   allocated_storage = 40
 
-  db_name  = "fcrepo"
+  db_name  = "fcrepo_cache"
   username = var.db_fcrepo_username
   password = module.db_fcrepo_password.result
   port     = 5432

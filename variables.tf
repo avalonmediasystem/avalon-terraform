@@ -173,28 +173,22 @@ variable "extra_docker_environment_variables" {
   default = {}
 }
 
-variable "fcrepo_binary_bucket_username" {
+variable "fcrepo_ocfl_bucket_username" {
   type = string
   default = ""
   description = "AWS IAM user for fedora bucket (will attempt to create if left blank)"
 }
 
-variable "fcrepo_binary_bucket_access_key" {
+variable "fcrepo_ocfl_bucket_access_key" {
   type = string
   default = ""
   description = "AWS IAM user access key for fedora bucket (will attempt to create if username blank)"
 }
 
-variable "fcrepo_binary_bucket_secret_key" {
+variable "fcrepo_ocfl_bucket_secret_key" {
   type = string
   default = ""
   description = "AWS IAM user secret key for fedora bucket (will attempt to create if username blank)"
-}
-
-variable "fcrepo_db_ssl" {
-  type = bool
-  default = false
-  description = "Forces SSL on the fedora database connection"
 }
 
 variable "hosted_zone_name" {
