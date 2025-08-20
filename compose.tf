@@ -81,8 +81,17 @@ data "aws_iam_policy_document" "compose_api_access" {
       "logs:DescribeLogStreams",
       "logs:PutLogEvents",
       "logs:PutRetentionPolicy",
+      "mediaconvert:*",
     ]
     resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:PassRole",
+    ]
+    resources = ["${aws_iam_role.this_mediaconvert_role.arn}"]
   }
 }
 
@@ -223,6 +232,7 @@ resource "aws_instance" "compose" {
     avalon_fqdn = length(var.alt_hostname) > 0 ? values(var.alt_hostname)[0].hostname : aws_route53_record.alb.fqdn
     streaming_fqdn = aws_route53_record.alb_streaming.fqdn
     elastictranscoder_pipeline_id = aws_elastictranscoder_pipeline.this_pipeline.id
+    media_convert_role = aws_iam_role.this_mediaconvert_role.arn
     email_comments = var.email_comments
     email_notification = var.email_notification
     email_support = var.email_support
