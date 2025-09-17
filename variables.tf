@@ -163,6 +163,12 @@ variable "email_support" {
   type = string
 }
 
+variable "encoding_engine_adapter" {
+  type = string
+  default = "elastic_transcoder"
+  description = "ActiveEncode adapter to use for transcoding media"
+}
+
 variable "environment" {
   type = string
 }
