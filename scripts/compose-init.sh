@@ -122,6 +122,7 @@ SETTINGS__ENCODING__ENGINE_ADAPTER=${encoding_engine_adapter}
 SETTINGS__ENCODING__PIPELINE=${elastictranscoder_pipeline_id}
 SETTINGS__ENCODING__MEDIA_CONVERT_ROLE=${media_convert_role}
 SETTINGS__ENCODING__DERIVATIVE_BUCKET=${derivatives_bucket_id}
+SETTINGS__ENCODING__MASTERFILE_BUCKET=${masterfiles_bucket_id}
 SETTINGS__ENCODING__PRESETS_PATH=config/media_convert_presets/
 SETTINGS__EMAIL__COMMENTS=${email_comments}
 SETTINGS__EMAIL__NOTIFICATION=${email_notification}
