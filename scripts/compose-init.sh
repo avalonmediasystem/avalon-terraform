@@ -119,7 +119,6 @@ SETTINGS__DROPBOX__UPLOAD_URI=s3://${masterfiles_bucket_id}/dropbox/
 SETTINGS__MASTER_FILE_MANAGEMENT__PATH=s3://${preservation_bucket_id}/
 SETTINGS__MASTER_FILE_MANAGEMENT__STRATEGY=MOVE
 SETTINGS__ENCODING__ENGINE_ADAPTER=${encoding_engine_adapter}
-SETTINGS__ENCODING__PIPELINE=${elastictranscoder_pipeline_id}
 SETTINGS__ENCODING__MEDIA_CONVERT_ROLE=${media_convert_role}
 SETTINGS__ENCODING__DERIVATIVE_BUCKET=${derivatives_bucket_id}
 SETTINGS__ENCODING__MASTERFILE_BUCKET=${masterfiles_bucket_id}
