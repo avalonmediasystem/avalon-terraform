@@ -16,6 +16,11 @@ data "aws_ami" "amzn" {
     values = ["ebs"]
   }
 
+  filter {
+    name = "architecture"
+    values = ["x86_64"]
+  }
+
   owners = ["137112412989"] # Amazon
 }
 
