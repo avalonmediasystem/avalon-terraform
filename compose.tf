@@ -243,6 +243,9 @@ resource "aws_instance" "compose" {
     bib_retriever_class = var.bib_retriever_class
     bib_retriever_class_require = var.bib_retriever_class_require
     extra_docker_environment_variables = var.extra_docker_environment_variables
+    active_record_encryption_primary_key = var.active_record_encryption_primary_key
+    active_record_encryption_deterministic_key = var.active_record_encryption_deterministic_key
+    active_record_encryption_key_derivation_salt = var.active_record_encryption_key_derivation_salt
   }))
 
   vpc_security_group_ids = [
