@@ -21,6 +21,15 @@ variable "app_name" {
   default = "avalon"
 }
 
+variable "active_record_encryption_primary_key" {
+}
+
+variable "active_record_encryption_deterministic_key" {
+}
+
+variable "active_record_encryption_key_derivation_salt" {
+}
+
 variable "azs" {
   type    = list(string)
   default = ["us-east-1a", "us-east-1b", "us-east-1c"]

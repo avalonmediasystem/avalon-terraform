@@ -41,6 +41,12 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
       AnotherTag = "Whatever value I want!"
     }
     ```
+    Run `tr -dc 0-9A-Za-z </dev/random 2>&- | head -c 32` three times and fill in these variables in `terraform.tfvars`:
+    ```
+    active_record_encryption_primary_key = 
+    active_record_encryption_deterministic_key = 
+    active_record_encryption_key_derivation_salt = 
+    ```
     * Note: You can have more than one variable file and pass the name on the command line to manage more than one stack.
 1. Execute `terraform init  -reconfigure -backend-config=dev.tfbackend`.
 
