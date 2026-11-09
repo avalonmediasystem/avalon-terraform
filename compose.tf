@@ -26,8 +26,6 @@ data "aws_ami" "amzn" {
 
 data "aws_iam_policy_document" "compose" {
   statement {
-    sid = ""
-
     actions = [
       "sts:AssumeRole",
     ]
@@ -265,14 +263,19 @@ resource "aws_route53_record" "ec2_hostname" {
   records = [aws_instance.compose.public_ip]
 }
 
-resource "null_resource" "install_docker_on_compose" {
-  triggers = {
-    host = aws_instance.compose.id
-  }
+resource "terraform_data" "install_docker_on_compose" {
+  triggers_replace = [
+    aws_instance.compose.id
+  ]
 
   provisioner "local-exec" {
     command = "aws codebuild start-build --project-name ${aws_codebuild_project.docker.name} --region ${var.aws_region}"
   }
+}
+
+moved {
+  from = null_resource.install_docker_on_compose
+  to   = terraform_data.install_docker_on_compose
 }
 
 resource "aws_s3_bucket_policy" "compose-s3" {
