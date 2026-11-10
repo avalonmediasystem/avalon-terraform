@@ -147,11 +147,11 @@ resource "aws_security_group_rule" "compose_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "allow_this_redis_access" {
-  security_group_id        = aws_security_group.redis.id
+resource "aws_security_group_rule" "allow_this_elasticache_access" {
+  security_group_id        = aws_security_group.elasticache.id
   type                     = "ingress"
-  from_port                = aws_elasticache_cluster.redis.cache_nodes[0].port
-  to_port                  = aws_elasticache_cluster.redis.cache_nodes[0].port
+  from_port                = aws_elasticache_replication_group.elasticache.port
+  to_port                  = aws_elasticache_replication_group.elasticache.port
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.compose.id
 }
@@ -221,7 +221,7 @@ resource "aws_instance" "compose" {
     avalon_docker_code_repo = var.avalon_docker_code_repo
     avalon_docker_code_branch = var.avalon_docker_code_branch
     avalon_docker_code_commit = var.avalon_docker_code_commit
-    redis_host_name = aws_route53_record.redis.name
+    redis_host_name = aws_route53_record.elasticache.name
     aws_region = var.aws_region
     avalon_fqdn = length(var.alt_hostname) > 0 ? values(var.alt_hostname)[0].hostname : aws_route53_record.alb.fqdn
     streaming_fqdn = aws_route53_record.alb_streaming.fqdn
