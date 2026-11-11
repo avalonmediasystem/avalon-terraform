@@ -122,7 +122,7 @@ variable "bastion_instance_type" {
 }
 
 variable "compose_instance_type" {
-  default = "t3.large"
+  default = "t4g.large"
 }
 
 variable "compose_volume_size" {
