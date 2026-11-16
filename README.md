@@ -10,13 +10,13 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
 # Getting started
 ## Prerequisites
 
-1. Download and install [Terraform 0.12+](https://www.terraform.io/downloads.html). The scripts have been upgraded to HCL 2 and therefore incompatible with earlier versions of Terraform.
+1. Download and install [OpenTofu 1.10+](https://opentofu.org/docs/intro/install/).
 1. Clone this repo
 1. Get a public key ready which will be used to access your EC2 instance. It can be either (or both) of:
     * An [EC2 key-pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) created or imported for your region.
     * A local SSH public key [generated manually](https://git-scm.com/book/en/v2/Git-on-the-Server-Generating-Your-SSH-Public-Key).
-1. Create an S3 bucket to hold the terraform state file. This is useful when
-    executing terraform on multiple machines (or working as a team) because it allows state to remain in sync. 
+1. Create an S3 bucket to hold the state file. This is useful when
+    executing on multiple machines (or working as a team) because it allows state to remain in sync.
 1. Create a file `dev.tfbackend` and fill in the previously created bucket name, its region, and a bucket key for where the state file file be stored.
 
     ```
@@ -48,17 +48,17 @@ The goal of this solution is to provide a simple, cost-effective way to put Aval
     active_record_encryption_key_derivation_salt = 
     ```
     * Note: You can have more than one variable file and pass the name on the command line to manage more than one stack.
-1. Execute `terraform init  -reconfigure -backend-config=dev.tfbackend`.
+1. Execute `tofu init  -reconfigure -backend-config=dev.tfbackend`.
 
 ## Bringing up the stack
 
 To see the changes Terraform will make:
 
-    terraform plan
+    tofu plan
 
 To actually make those changes:
 
-    terraform apply
+    tofu apply
 
 Be patient, the script attempts to register SSL certificates for your domains and AWS cert validation process can take from 5 to 30 minutes.
 
@@ -90,20 +90,20 @@ Turnkey comes bundled with [Persona](https://github.com/samvera-labs/samvera-per
 # Maintenance
 
 ## Upgrading Avalon
-Upgrading the version of Avalon running in the stack happens by modifying the variables in terraform.tfvars then running `terraform apply`.  If you have customized your Avalon instance, first rebase your changes on top of the latest Avalon release, resolve conflicts, and push to your branch.
+Upgrading the version of Avalon running in the stack happens by modifying the variables in terraform.tfvars then running `tofu apply`.  If you have customized your Avalon instance, first rebase your changes on top of the latest Avalon release, resolve conflicts, and push to your branch.
 
 This will rebuild the container image from the Avalon code branch specified, push it to the AWS container registry, and send an SSM message that triggers pulling down the new image and restarting docker-compose on the EC2 instance.
 
 
 ## Update the stack
-You can proceed with `terraform plan` and `terraform apply` as often as you want to see and apply changes to the
+You can proceed with `tofu plan` and `tofu apply` as often as you want to see and apply changes to the
 stack. Changes you make to the `*.tf` files  will automatically be reflected in the resources under Terraform's
 control.
 
 ## Destroy the stack
 Special care must be taken if you want to retain all data when destroying the stack. If that wasn't a concern, you can simply run
     
-    terraform destroy
+    tofu destroy
 
 ## Update the containers
 Since Avalon, Fedora, Solr and Nginx are running inside Docker containers managed by docker-compose, you can SSH to the EC2 box and run docker-compose commands as usual.

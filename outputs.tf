@@ -48,7 +48,7 @@ output "vpc_cidr_block" {
 # output "security_groups" {
 #   value = {
 #     bastion    = "${aws_security_group.bastion.id}"
-#     cache      = "${aws_security_group.redis.id}"
+#     cache      = "${aws_security_group.elasticache.id}"
 #     db         = "${aws_security_group.db.id}"
 #     fcrepo     = "${module.fcrepo_environment.security_group_id}"
 #     index      = "${module.solr_environment.security_group_id}"
@@ -67,11 +67,11 @@ output "vpc_cidr_block" {
 # }
 
 output "cache_address" {
-  value = aws_route53_record.redis.name
+  value = aws_route53_record.elasticache.name
 }
 
 output "cache_port" {
-  value = aws_elasticache_cluster.redis.cache_nodes[0].port
+  value = aws_elasticache_replication_group.elasticache.port
 }
 
 # output "zookeeper_address" {

@@ -26,8 +26,6 @@ data "aws_ami" "amzn" {
 
 data "aws_iam_policy_document" "compose" {
   statement {
-    sid = ""
-
     actions = [
       "sts:AssumeRole",
     ]
@@ -149,11 +147,11 @@ resource "aws_security_group_rule" "compose_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "allow_this_redis_access" {
-  security_group_id        = aws_security_group.redis.id
+resource "aws_security_group_rule" "allow_this_elasticache_access" {
+  security_group_id        = aws_security_group.elasticache.id
   type                     = "ingress"
-  from_port                = aws_elasticache_cluster.redis.cache_nodes[0].port
-  to_port                  = aws_elasticache_cluster.redis.cache_nodes[0].port
+  from_port                = aws_elasticache_replication_group.elasticache.port
+  to_port                  = aws_elasticache_replication_group.elasticache.port
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.compose.id
 }
@@ -223,7 +221,7 @@ resource "aws_instance" "compose" {
     avalon_docker_code_repo = var.avalon_docker_code_repo
     avalon_docker_code_branch = var.avalon_docker_code_branch
     avalon_docker_code_commit = var.avalon_docker_code_commit
-    redis_host_name = aws_route53_record.redis.name
+    redis_host_name = aws_route53_record.elasticache.name
     aws_region = var.aws_region
     avalon_fqdn = length(var.alt_hostname) > 0 ? values(var.alt_hostname)[0].hostname : aws_route53_record.alb.fqdn
     streaming_fqdn = aws_route53_record.alb_streaming.fqdn
@@ -265,14 +263,19 @@ resource "aws_route53_record" "ec2_hostname" {
   records = [aws_instance.compose.public_ip]
 }
 
-resource "null_resource" "install_docker_on_compose" {
-  triggers = {
-    host = aws_instance.compose.id
-  }
+resource "terraform_data" "install_docker_on_compose" {
+  triggers_replace = [
+    aws_instance.compose.id
+  ]
 
   provisioner "local-exec" {
     command = "aws codebuild start-build --project-name ${aws_codebuild_project.docker.name} --region ${var.aws_region}"
   }
+}
+
+moved {
+  from = null_resource.install_docker_on_compose
+  to   = terraform_data.install_docker_on_compose
 }
 
 resource "aws_s3_bucket_policy" "compose-s3" {
