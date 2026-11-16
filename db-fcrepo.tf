@@ -12,7 +12,7 @@ module "db_fcrepo" {
   engine_version = var.postgres_version
   family         = "postgres${element(split(".", var.postgres_version), 0)}"
 
-  instance_class    = "db.t3.micro"
+  instance_class    = "db.t4g.micro"
   allocated_storage = 40
 
   db_name  = "fcrepo_cache"
